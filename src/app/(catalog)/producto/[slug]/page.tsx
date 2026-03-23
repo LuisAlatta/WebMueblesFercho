@@ -43,8 +43,14 @@ export default async function ProductoPage({ params }: { params: Promise<{ slug:
     data: { viewCount: { increment: 1 } },
   }).catch(() => {});
 
+  // Serializar Decimal → number en variantes
+  const productSerialized = {
+    ...product,
+    variants: product.variants.map((v) => ({ ...v, price: Number(v.price) })),
+  };
+
   // Productos relacionados
-  const related = await prisma.product.findMany({
+  const rawRelated = await prisma.product.findMany({
     where: { categoryId: product.categoryId, isActive: true, NOT: { id: product.id } },
     take: 4,
     include: {
@@ -53,6 +59,38 @@ export default async function ProductoPage({ params }: { params: Promise<{ slug:
       variants: { where: { isActive: true }, select: { price: true }, orderBy: { price: "asc" } },
     },
   });
+  const related = rawRelated.map((p) => ({ ...p, variants: p.variants.map((v) => ({ price: Number(v.price) })) }));
 
-  return <ProductDetail product={product} related={related} />;
+  const base = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
+  const minPrice = productSerialized.variants[0]?.price;
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    description: product.description?.replace(/<[^>]*>/g, "") ?? undefined,
+    image: product.images.map((i) => i.url),
+    url: `${base}/producto/${product.slug}`,
+    brand: { "@type": "Brand", name: "Muebles Fercho" },
+    category: product.category.name,
+    ...(minPrice !== undefined && {
+      offers: {
+        "@type": "Offer",
+        priceCurrency: "ARS",
+        price: minPrice,
+        availability: "https://schema.org/InStock",
+        seller: { "@type": "Organization", name: "Muebles Fercho" },
+      },
+    }),
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <ProductDetail product={productSerialized} related={related} />
+    </>
+  );
 }

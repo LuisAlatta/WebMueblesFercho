@@ -21,7 +21,7 @@ export default async function CategoriaPage({ params }: { params: Promise<{ slug
   });
   if (!category) notFound();
 
-  const products = await prisma.product.findMany({
+  const raw = await prisma.product.findMany({
     where: { categoryId: category.id, isActive: true },
     orderBy: [{ isFeatured: "desc" }, { order: "asc" }],
     include: {
@@ -30,6 +30,7 @@ export default async function CategoriaPage({ params }: { params: Promise<{ slug
       variants: { where: { isActive: true }, select: { price: true }, orderBy: { price: "asc" } },
     },
   });
+  const products = raw.map((p) => ({ ...p, variants: p.variants.map((v) => ({ price: Number(v.price) })) }));
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">

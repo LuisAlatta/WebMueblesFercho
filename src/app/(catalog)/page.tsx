@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { prisma } from "@/lib/prisma";
 import ProductCard from "@/components/catalog/ProductCard";
+import AnimatedSection from "@/components/catalog/AnimatedSection";
 import { ArrowRight, CheckCircle, MessageCircle } from "lucide-react";
 import { buildSimpleWhatsAppUrl } from "@/lib/whatsapp";
 
@@ -23,7 +24,7 @@ async function getData() {
         images: { orderBy: { order: "asc" }, take: 1 },
         variants: { where: { isActive: true }, select: { price: true }, orderBy: { price: "asc" } },
       },
-    }),
+    }).then((ps) => ps.map((p) => ({ ...p, variants: p.variants.map((v) => ({ price: Number(v.price) })) }))),
     prisma.testimonial.findMany({
       where: { isActive: true },
       orderBy: { createdAt: "desc" },
@@ -85,6 +86,7 @@ export default async function HomePage() {
       {categories.length > 0 && (
         <section className="py-16 px-4 bg-[#FAF9F7]">
           <div className="max-w-7xl mx-auto">
+            <AnimatedSection>
             <h2
               className="text-2xl md:text-3xl font-bold text-[#1C1C1E] mb-8 text-center"
               style={{ fontFamily: "var(--font-playfair)" }}
@@ -113,6 +115,7 @@ export default async function HomePage() {
                 </Link>
               ))}
             </div>
+          </AnimatedSection>
           </div>
         </section>
       )}
@@ -121,6 +124,7 @@ export default async function HomePage() {
       {featuredProducts.length > 0 && (
         <section className="py-16 px-4">
           <div className="max-w-7xl mx-auto">
+            <AnimatedSection>
             <div className="flex items-end justify-between mb-8">
               <h2
                 className="text-2xl md:text-3xl font-bold text-[#1C1C1E]"
@@ -137,6 +141,7 @@ export default async function HomePage() {
                 <ProductCard key={p.id} {...p} isFeatured />
               ))}
             </div>
+            </AnimatedSection>
           </div>
         </section>
       )}
@@ -175,6 +180,7 @@ export default async function HomePage() {
       {/* Por qué elegirnos */}
       <section className="py-16 px-4 bg-[#FAF9F7]">
         <div className="max-w-5xl mx-auto text-center">
+          <AnimatedSection>
           <h2
             className="text-2xl md:text-3xl font-bold text-[#1C1C1E] mb-10"
             style={{ fontFamily: "var(--font-playfair)" }}
@@ -194,6 +200,7 @@ export default async function HomePage() {
               </div>
             ))}
           </div>
+          </AnimatedSection>
         </div>
       </section>
 
@@ -201,6 +208,7 @@ export default async function HomePage() {
       {testimonials.length > 0 && (
         <section className="py-16 px-4">
           <div className="max-w-5xl mx-auto">
+            <AnimatedSection>
             <h2
               className="text-2xl md:text-3xl font-bold text-[#1C1C1E] text-center mb-10"
               style={{ fontFamily: "var(--font-playfair)" }}
@@ -220,6 +228,7 @@ export default async function HomePage() {
                 </div>
               ))}
             </div>
+            </AnimatedSection>
           </div>
         </section>
       )}

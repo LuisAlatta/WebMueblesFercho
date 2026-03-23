@@ -15,17 +15,16 @@ async function getProducts(filters: Awaited<Props["searchParams"]>) {
   if (filters.categoria) where.category = { slug: filters.categoria };
   if (filters.search) where.name = { contains: filters.search, mode: "insensitive" };
 
-  const orderBy = filters.orden === "precio_asc"
-    ? undefined
-    : filters.orden === "precio_desc"
+  const byPrice = filters.orden === "precio_asc" || filters.orden === "precio_desc";
+  const orderBy = byPrice
     ? undefined
     : filters.orden === "nuevos"
-    ? { createdAt: "desc" as const }
+    ? ({ createdAt: "desc" } as const)
     : [{ isFeatured: "desc" as const }, { order: "asc" as const }];
 
-  const products = await prisma.product.findMany({
+  const raw = await prisma.product.findMany({
     where,
-    orderBy: orderBy as Parameters<typeof prisma.product.findMany>[0]["orderBy"],
+    ...(orderBy ? { orderBy } : {}),
     include: {
       category: { select: { name: true, slug: true } },
       images: { orderBy: { order: "asc" }, take: 1 },
@@ -33,17 +32,22 @@ async function getProducts(filters: Awaited<Props["searchParams"]>) {
     },
   });
 
-  // Ordenar por precio en JS si hace falta
+  // Serializar Decimal → number
+  const products = raw.map((p) => ({
+    ...p,
+    variants: p.variants.map((v) => ({ price: Number(v.price) })),
+  }));
+
   if (filters.orden === "precio_asc") {
     products.sort((a, b) => {
-      const pa = a.variants[0] ? Number(a.variants[0].price) : Infinity;
-      const pb = b.variants[0] ? Number(b.variants[0].price) : Infinity;
+      const pa = a.variants[0]?.price ?? Infinity;
+      const pb = b.variants[0]?.price ?? Infinity;
       return pa - pb;
     });
   } else if (filters.orden === "precio_desc") {
     products.sort((a, b) => {
-      const pa = a.variants[0] ? Number(a.variants[0].price) : 0;
-      const pb = b.variants[0] ? Number(b.variants[0].price) : 0;
+      const pa = a.variants[0]?.price ?? 0;
+      const pb = b.variants[0]?.price ?? 0;
       return pb - pa;
     });
   }
