@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import AdminTopBar from "@/components/admin/AdminTopBar";
+import SingleImageUpload from "@/components/admin/SingleImageUpload";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -64,20 +65,18 @@ export default function GaleriaPage() {
       <main className="flex-1 overflow-y-auto p-6 space-y-6">
         <div className="bg-white rounded-xl border border-gray-100 p-5 max-w-lg space-y-4">
           <h2 className="font-semibold text-[#1C1C1E]">Agregar foto</h2>
-          <p className="text-xs text-[#7A7A7A]">Próximamente: subida directa drag-and-drop con Cloudinary. Por ahora, pegá la URL de Cloudinary.</p>
-          <div className="space-y-2">
-            <Label>URL de la imagen</Label>
-            <Input value={form.url} onChange={(e) => setForm((p) => ({ ...p, url: e.target.value }))} placeholder="https://res.cloudinary.com/..." />
-          </div>
-          <div className="space-y-2">
-            <Label>Public ID (Cloudinary)</Label>
-            <Input value={form.publicId} onChange={(e) => setForm((p) => ({ ...p, publicId: e.target.value }))} placeholder="muebles-fercho/foto-1" />
-          </div>
+          <SingleImageUpload
+            value={form.url}
+            onChange={(url, publicId) => setForm((p) => ({ ...p, url, publicId }))}
+            onClear={() => setForm((p) => ({ ...p, url: "", publicId: "" }))}
+            folder="muebles-fercho/galeria"
+            label="Foto"
+          />
           <div className="space-y-2">
             <Label>Título (opcional)</Label>
             <Input value={form.title} onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))} placeholder="Dormitorio en nogal" />
           </div>
-          <Button onClick={add} disabled={saving} className="bg-[#1C1C1E] hover:bg-[#2C2C2E] text-white">
+          <Button onClick={add} disabled={saving || !form.url} className="bg-[#1C1C1E] hover:bg-[#2C2C2E] text-white">
             {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Plus className="w-4 h-4 mr-2" />}
             Agregar foto
           </Button>

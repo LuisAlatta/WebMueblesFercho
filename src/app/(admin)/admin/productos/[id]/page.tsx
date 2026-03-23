@@ -3,6 +3,7 @@
 import { useEffect, useState, use } from "react";
 import { useRouter } from "next/navigation";
 import AdminTopBar from "@/components/admin/AdminTopBar";
+import ImageUpload from "@/components/admin/ImageUpload";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -333,6 +334,13 @@ export default function EditProductoPage({ params }: { params: Promise<{ id: str
             </div>
           </div>
         </div>
+
+        {/* Imágenes */}
+        <div className="bg-white rounded-xl border border-gray-100 p-6">
+          <h2 className="font-semibold text-[#1C1C1E] mb-4">Imágenes del producto</h2>
+          <ImageUpload productId={parseInt(id)} />
+        </div>
+
       </main>
     </>
   );

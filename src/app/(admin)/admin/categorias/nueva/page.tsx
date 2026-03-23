@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import AdminTopBar from "@/components/admin/AdminTopBar";
+import SingleImageUpload from "@/components/admin/SingleImageUpload";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,7 +15,7 @@ import Link from "next/link";
 export default function NuevaCategoriaPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({ name: "", description: "" });
+  const [form, setForm] = useState({ name: "", description: "", imageUrl: "", imagePublicId: "" });
 
   function set(field: string, value: string) {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -27,7 +28,7 @@ export default function NuevaCategoriaPage() {
     const res = await fetch("/api/categorias", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
+      body: JSON.stringify({ name: form.name, description: form.description, imageUrl: form.imageUrl || null }),
     });
     setLoading(false);
     if (res.ok) {
@@ -69,6 +70,14 @@ export default function NuevaCategoriaPage() {
                 rows={3}
               />
             </div>
+            <SingleImageUpload
+              value={form.imageUrl}
+              onChange={(url, publicId) => setForm((p) => ({ ...p, imageUrl: url, imagePublicId: publicId }))}
+              onClear={() => setForm((p) => ({ ...p, imageUrl: "", imagePublicId: "" }))}
+              folder="muebles-fercho/categorias"
+              label="Imagen de la categoría"
+            />
+
             <div className="flex gap-3 pt-2">
               <Button type="submit" disabled={loading} className="bg-[#1C1C1E] hover:bg-[#2C2C2E] text-white">
                 {loading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Guardando...</> : "Crear categoría"}
