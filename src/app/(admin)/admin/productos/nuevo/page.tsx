@@ -10,6 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
@@ -69,13 +70,13 @@ export default function NuevoProductoPage() {
   return (
     <>
       <AdminTopBar title="Nuevo producto" />
-      <main className="flex-1 overflow-y-auto p-6">
+      <main className="flex-1 overflow-y-auto p-4 sm:p-6">
         <Link href="/admin/productos" className="inline-flex items-center gap-1.5 text-sm text-[#7A7A7A] hover:text-[#1C1C1E] mb-6 transition-colors">
           <ArrowLeft className="w-4 h-4" /> Volver
         </Link>
 
         <div className="max-w-xl">
-          <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-gray-100 p-6 space-y-5">
+          <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-gray-100 p-4 sm:p-6 space-y-5">
             <div className="space-y-2">
               <Label>Nombre *</Label>
               <Input
@@ -98,6 +99,16 @@ export default function NuevoProductoPage() {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Descripción</Label>
+              <Textarea
+                value={form.description}
+                onChange={(e) => set("description", e.target.value)}
+                placeholder="Descripción del producto (opcional)"
+                rows={3}
+              />
             </div>
 
             <div className="grid grid-cols-2 gap-4">

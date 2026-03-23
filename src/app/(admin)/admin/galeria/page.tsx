@@ -23,46 +23,68 @@ export default function GaleriaPage() {
 
   async function load() {
     setLoading(true);
-    const data = await fetch("/api/galeria").then((r) => r.json());
-    setPhotos(data);
+    const res = await fetch("/api/galeria");
+    if (res.ok) {
+      const data = await res.json();
+      setPhotos(data);
+    } else {
+      toast.error("Error al cargar la galería");
+    }
     setLoading(false);
   }
 
   useEffect(() => { load(); }, []);
 
   async function add() {
-    if (!form.url || !form.publicId) { toast.error("URL y publicId requeridos"); return; }
+    if (!form.url || !form.publicId) { toast.error("Debes subir una imagen primero"); return; }
     setSaving(true);
-    await fetch("/api/galeria", {
+    const res = await fetch("/api/galeria", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ...form, order: photos.length }),
     });
     setSaving(false);
-    toast.success("Foto agregada");
-    setForm({ url: "", publicId: "", title: "" });
-    load();
+    if (res.ok) {
+      toast.success("Foto agregada");
+      setForm({ url: "", publicId: "", title: "" });
+      load();
+    } else {
+      toast.error("Error al agregar la foto");
+    }
   }
 
   async function toggle(photo: GalleryPhoto) {
-    await fetch("/api/galeria", {
+    const res = await fetch("/api/galeria", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id: photo.id, isActive: !photo.isActive }),
     });
-    load();
+    if (res.ok) {
+      load();
+    } else {
+      toast.error("Error al actualizar");
+    }
   }
 
   async function remove(id: number) {
     if (!confirm("¿Eliminar esta foto?")) return;
-    await fetch("/api/galeria", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }) });
-    toast.success("Foto eliminada"); load();
+    const res = await fetch("/api/galeria", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
+    if (res.ok) {
+      toast.success("Foto eliminada");
+      load();
+    } else {
+      toast.error("Error al eliminar la foto");
+    }
   }
 
   return (
     <>
       <AdminTopBar title="Galería de trabajos" />
-      <main className="flex-1 overflow-y-auto p-6 space-y-6">
+      <main className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-6">
         <div className="bg-white rounded-xl border border-gray-100 p-5 max-w-lg space-y-4">
           <h2 className="font-semibold text-[#1C1C1E]">Agregar foto</h2>
           <SingleImageUpload
@@ -87,24 +109,33 @@ export default function GaleriaPage() {
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {photos.map((photo) => (
-              <div key={photo.id} className={`relative group rounded-xl overflow-hidden border ${photo.isActive ? "border-gray-100" : "border-gray-200 opacity-50"}`}>
+              <div
+                key={photo.id}
+                className={`rounded-xl overflow-hidden border ${
+                  photo.isActive ? "border-gray-100" : "border-gray-200 opacity-60"
+                }`}
+              >
                 <div className="aspect-[4/3] bg-gray-100 relative">
                   <Image src={photo.url} alt={photo.title ?? "Foto"} fill className="object-cover" />
                 </div>
-                {photo.title && <p className="text-xs text-[#2C2C2C] px-2 py-1.5 truncate">{photo.title}</p>}
-                <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button
-                    onClick={() => toggle(photo)}
-                    className="bg-white text-xs px-2 py-1 rounded shadow text-[#7A7A7A] hover:text-[#1C1C1E]"
-                  >
-                    {photo.isActive ? "Ocultar" : "Mostrar"}
-                  </button>
-                  <button
-                    onClick={() => remove(photo.id)}
-                    className="bg-white text-red-400 hover:text-red-600 p-1 rounded shadow"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+                <div className="p-2 flex items-center justify-between gap-1">
+                  <p className="text-xs text-[#2C2C2C] truncate flex-1">
+                    {photo.title || <span className="text-gray-400 italic">Sin título</span>}
+                  </p>
+                  <div className="flex gap-1 shrink-0">
+                    <button
+                      onClick={() => toggle(photo)}
+                      className="text-xs px-1.5 py-0.5 rounded border border-gray-200 text-[#7A7A7A] hover:text-[#1C1C1E] transition-colors whitespace-nowrap"
+                    >
+                      {photo.isActive ? "Ocultar" : "Mostrar"}
+                    </button>
+                    <button
+                      onClick={() => remove(photo.id)}
+                      className="text-red-400 hover:text-red-600 transition-colors p-0.5"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}

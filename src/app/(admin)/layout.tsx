@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
-import AdminSidebar from "@/components/admin/AdminSidebar";
+import AdminShell from "@/components/admin/AdminShell";
 import SessionProvider from "@/components/admin/SessionProvider";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -18,12 +18,7 @@ export default async function AdminLayout({
 
   return (
     <SessionProvider>
-      <div className="flex h-screen overflow-hidden bg-[#FAF9F7]">
-        <AdminSidebar />
-        <div className="flex-1 flex flex-col overflow-hidden">
-          {children}
-        </div>
-      </div>
+      <AdminShell>{children}</AdminShell>
       <Toaster richColors position="top-right" />
     </SessionProvider>
   );

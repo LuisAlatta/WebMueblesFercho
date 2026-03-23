@@ -36,6 +36,7 @@ export default function RootLayout({
     <html
       lang="es"
       className={`${inter.variable} ${playfair.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-background text-foreground font-[var(--font-inter)]">
         <GoogleAnalytics />

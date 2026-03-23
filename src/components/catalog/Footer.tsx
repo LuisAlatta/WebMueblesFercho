@@ -18,52 +18,75 @@ export default function Footer({ config }: { config: Config | null }) {
   const wa = config?.whatsapp;
 
   return (
-    <footer className="bg-[#1C1C1E] text-white/80">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 grid grid-cols-1 sm:grid-cols-3 gap-8">
-        {/* Marca */}
+    <footer className="bg-white border-t border-gray-200">
+      {/* Main content */}
+      <div className="max-w-7xl mx-auto px-6 py-14 grid grid-cols-1 sm:grid-cols-3 gap-10">
+
+        {/* Col 1: Branding */}
         <div>
-          <h3
-            className="text-white text-lg font-bold mb-3"
+          <span
+            className="block text-xl font-bold text-[#1C1C1E] mb-1 leading-tight"
             style={{ fontFamily: "var(--font-playfair)" }}
           >
             {name}
-          </h3>
-          <p className="text-sm leading-relaxed text-white/60">
-            Fabricamos muebles a medida con madera, melamina y MDF. Calidad artesanal para tu hogar.
+          </span>
+          <span className="block text-[10px] text-[#999] uppercase tracking-[0.2em] font-medium mb-4">
+            Fabricación a medida
+          </span>
+          <p className="text-sm text-[#777] leading-relaxed max-w-xs">
+            Arquitectura, diseño de interiores y mobiliario a medida para tu hogar y empresa.
           </p>
-          {/* Redes */}
-          <div className="flex gap-3 mt-4">
+          {/* Social icons */}
+          <div className="flex gap-4 mt-5">
             {config?.instagram && (
-              <a href={`https://instagram.com/${config.instagram}`} target="_blank" rel="noopener noreferrer" className="hover:text-[#C9A96E] transition-colors">
+              <a
+                href={`https://instagram.com/${config.instagram}`}
+                target="_blank" rel="noopener noreferrer"
+                aria-label="Instagram"
+                className="text-[#999] hover:text-[#C9A96E] transition-colors"
+              >
                 <Instagram className="w-5 h-5" />
               </a>
             )}
             {config?.facebook && (
-              <a href={`https://facebook.com/${config.facebook}`} target="_blank" rel="noopener noreferrer" className="hover:text-[#C9A96E] transition-colors">
+              <a
+                href={`https://facebook.com/${config.facebook}`}
+                target="_blank" rel="noopener noreferrer"
+                aria-label="Facebook"
+                className="text-[#999] hover:text-[#C9A96E] transition-colors"
+              >
                 <Facebook className="w-5 h-5" />
               </a>
             )}
             {wa && (
-              <a href={`https://wa.me/${wa}`} target="_blank" rel="noopener noreferrer" className="hover:text-[#C9A96E] transition-colors">
+              <a
+                href={`https://wa.me/${wa}`}
+                target="_blank" rel="noopener noreferrer"
+                aria-label="WhatsApp"
+                className="text-[#999] hover:text-[#C9A96E] transition-colors"
+              >
                 <MessageCircle className="w-5 h-5" />
               </a>
             )}
           </div>
         </div>
 
-        {/* Links */}
+        {/* Col 2: Navigation */}
         <div>
-          <h4 className="text-white text-sm font-semibold mb-3 uppercase tracking-wider">Catálogo</h4>
-          <ul className="space-y-2 text-sm">
+          <h4 className="text-xs font-semibold uppercase tracking-[0.2em] text-[#1C1C1E] mb-5">
+            Navegación
+          </h4>
+          <ul className="space-y-2.5">
             {[
-              { href: "/catalogo", label: "Todos los productos" },
-              { href: "/galeria", label: "Galería de trabajos" },
+              { href: "/", label: "Home" },
+              { href: "/catalogo", label: "Catálogo" },
+              { href: "/galeria", label: "Galería" },
               { href: "/como-trabajamos", label: "Cómo trabajamos" },
               { href: "/nosotros", label: "Nosotros" },
               { href: "/faq", label: "Preguntas frecuentes" },
             ].map((l) => (
               <li key={l.href}>
-                <Link href={l.href} className="hover:text-[#C9A96E] transition-colors">
+                <Link href={l.href} className="text-sm text-[#777] hover:text-[#C9A96E] transition-colors">
                   {l.label}
                 </Link>
               </li>
@@ -71,31 +94,43 @@ export default function Footer({ config }: { config: Config | null }) {
           </ul>
         </div>
 
-        {/* Contacto */}
+        {/* Col 3: Contact */}
         <div>
-          <h4 className="text-white text-sm font-semibold mb-3 uppercase tracking-wider">Contacto</h4>
-          <ul className="space-y-2 text-sm">
-            {config?.phone && <li>{config.phone}</li>}
-            {config?.email && <li>{config.email}</li>}
-            {config?.address && <li className="text-white/60">{config.address}</li>}
-            {wa && (
+          <h4 className="text-xs font-semibold uppercase tracking-[0.2em] text-[#1C1C1E] mb-5">
+            Contáctenos
+          </h4>
+          <ul className="space-y-2.5 text-sm text-[#777]">
+            {config?.phone && (
               <li>
-                <a
-                  href={`https://wa.me/${wa}?text=${encodeURIComponent("Hola! Quisiera información sobre sus muebles.")}`}
-                  target="_blank" rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white text-xs px-3 py-1.5 rounded-full transition-colors mt-1"
-                >
-                  <MessageCircle className="w-3.5 h-3.5" />
-                  Escribinos por WhatsApp
+                <a href={`tel:${config.phone}`} className="hover:text-[#C9A96E] transition-colors">
+                  {config.phone}
                 </a>
               </li>
+            )}
+            {wa && (
+              <li>
+                <a href={`https://wa.me/${wa}`} target="_blank" rel="noopener noreferrer" className="hover:text-[#C9A96E] transition-colors">
+                  {wa}
+                </a>
+              </li>
+            )}
+            {config?.email && (
+              <li>
+                <a href={`mailto:${config.email}`} className="hover:text-[#C9A96E] transition-colors">
+                  {config.email}
+                </a>
+              </li>
+            )}
+            {config?.address && (
+              <li className="leading-relaxed text-[#999]">{config.address}</li>
             )}
           </ul>
         </div>
       </div>
 
-      <div className="border-t border-white/10 py-4 text-center text-xs text-white/40">
-        © {year} {name}. Todos los derechos reservados.
+      {/* Bottom bar */}
+      <div className="border-t border-gray-100 py-5 text-center text-xs text-[#aaa]">
+        © {year} {name} — Todos los derechos reservados.
       </div>
     </footer>
   );

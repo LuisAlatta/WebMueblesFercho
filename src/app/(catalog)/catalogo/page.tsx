@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import ProductCard from "@/components/catalog/ProductCard";
 import FilterSidebar from "@/components/catalog/FilterSidebar";
+import MobileFilterDrawer from "@/components/catalog/MobileFilterDrawer";
+import OrdenSelect from "@/components/catalog/OrdenSelect";
 import { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Catálogo" };
@@ -32,7 +34,6 @@ async function getProducts(filters: Awaited<Props["searchParams"]>) {
     },
   });
 
-  // Serializar Decimal → number
   const products = raw.map((p) => ({
     ...p,
     variants: p.variants.map((v) => ({ price: Number(v.price) })),
@@ -70,35 +71,39 @@ export default async function CatalogoPage({ searchParams }: Props) {
     : "Catálogo completo";
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-10">
       <div className="flex gap-8">
-        {/* Sidebar filtros */}
+        {/* Sidebar filtros — solo desktop */}
         <aside className="hidden lg:block w-56 shrink-0">
-          <FilterSidebar
-            categories={categories}
-            materials={materials}
-            active={filters}
-          />
+          <FilterSidebar categories={categories} materials={materials} active={filters} />
         </aside>
 
-        {/* Grid */}
+        {/* Contenido principal */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-center justify-between mb-6">
-            <div>
+          {/* Header del catálogo */}
+          <div className="flex items-center justify-between mb-5 gap-3">
+            <div className="min-w-0">
               <h1
-                className="text-xl font-bold text-[#1C1C1E]"
+                className="text-lg sm:text-xl font-bold text-[#1C1C1E] truncate"
                 style={{ fontFamily: "var(--font-playfair)" }}
               >
                 {title}
               </h1>
-              <p className="text-sm text-[#7A7A7A] mt-0.5">{products.length} productos</p>
+              <p className="text-xs sm:text-sm text-[#7A7A7A] mt-0.5">{products.length} productos</p>
             </div>
-            {/* Ordenamiento */}
-            <OrdenSelect current={filters.orden} />
+
+            {/* Controles filtros + orden */}
+            <div className="flex items-center gap-2 shrink-0">
+              {/* Botón filtros mobile */}
+              <MobileFilterDrawer categories={categories} materials={materials} active={filters} />
+              {/* Ordenamiento */}
+              <OrdenSelect current={filters.orden} />
+            </div>
           </div>
 
+          {/* Grid de productos */}
           {products.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
               {products.map((p) => (
                 <ProductCard key={p.id} {...p} />
               ))}
@@ -111,33 +116,5 @@ export default async function CatalogoPage({ searchParams }: Props) {
         </div>
       </div>
     </div>
-  );
-}
-
-function OrdenSelect({ current }: { current?: string }) {
-  const options = [
-    { value: "", label: "Destacados" },
-    { value: "nuevos", label: "Más nuevos" },
-    { value: "precio_asc", label: "Precio: menor a mayor" },
-    { value: "precio_desc", label: "Precio: mayor a menor" },
-  ];
-  return (
-    <form>
-      <select
-        name="orden"
-        defaultValue={current ?? ""}
-        onChange={(e) => {
-          const url = new URL(window.location.href);
-          if (e.target.value) url.searchParams.set("orden", e.target.value);
-          else url.searchParams.delete("orden");
-          window.location.href = url.toString();
-        }}
-        className="text-sm border border-gray-200 rounded-lg px-3 py-2 text-[#2C2C2C] bg-white outline-none focus:border-[#C9A96E] cursor-pointer"
-      >
-        {options.map((o) => (
-          <option key={o.value} value={o.value}>{o.label}</option>
-        ))}
-      </select>
-    </form>
   );
 }

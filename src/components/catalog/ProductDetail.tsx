@@ -76,6 +76,20 @@ export default function ProductDetail({ product, related }: { product: Product; 
   }
 
   return (
+    <>
+    {/* Barra sticky WhatsApp — solo mobile */}
+    <div className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-white border-t border-gray-200 px-4 py-3 flex gap-3">
+      <a
+        href={waUrl}
+        target="_blank" rel="noopener noreferrer"
+        className="flex-1 flex items-center justify-center gap-2 bg-green-500 active:bg-green-600 text-white font-semibold py-3.5 rounded-xl text-sm transition-colors"
+      >
+        <MessageCircle className="w-5 h-5" />
+        Consultar por WhatsApp
+      </a>
+    </div>
+    {/* Espacio para que el contenido no quede detrás del sticky bar en mobile */}
+    <div className="h-20 md:hidden" />
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
       <Link href={`/categoria/${product.category.slug}`} className="inline-flex items-center gap-1.5 text-sm text-[#7A7A7A] hover:text-[#1C1C1E] mb-6 transition-colors">
         <ArrowLeft className="w-4 h-4" /> {product.category.name}
@@ -272,5 +286,6 @@ export default function ProductDetail({ product, related }: { product: Product; 
         </div>
       )}
     </div>
+    </>
   );
 }

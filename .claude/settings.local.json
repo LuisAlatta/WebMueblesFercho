@@ -36,7 +36,17 @@
       "Bash(timeout 15 npm run dev)",
       "Bash(timeout 12 npm run dev)",
       "Bash(npm run:*)",
-      "mcp__supabase__get_publishable_keys"
+      "mcp__supabase__get_publishable_keys",
+      "WebFetch(domain:www.lineofdesign.pe)",
+      "Bash(ls:*)",
+      "Bash(find \"C:\\\\Users\\\\luis-\\\\Documents\\\\Proyectos\\\\WebMueblesFercho\\\\src\\\\app\\\\\\(admin\\)\" -type f -name \"*.tsx\" -o -name \"*.ts\")",
+      "Bash(find \"C:\\\\Users\\\\luis-\\\\Documents\\\\Proyectos\\\\WebMueblesFercho\\\\src\\\\app\\\\\\(admin\\)\\\\admin\" -type f -name \"*.tsx\")",
+      "Bash(cd:*)",
+      "Bash(find \"C:\\\\Users\\\\luis-\\\\Documents\\\\Proyectos\\\\WebMueblesFercho/src/app/\\(admin\\)\" -type f -name \"*.tsx\" -o -name \"*.ts\" -o -name \"*.jsx\" -o -name \"*.js\")",
+      "Bash(find \"C:\\\\Users\\\\luis-\\\\Documents\\\\Proyectos\\\\WebMueblesFercho/src/app/\\(admin\\)\" -type f -name \"*.tsx\")",
+      "Bash(find \"C:\\\\Users\\\\luis-\\\\Documents\\\\Proyectos\\\\WebMueblesFercho/src/app/\\(admin\\)/admin\" -type d)",
+      "Bash(mkdir -p \"C:/Users/luis-/Documents/Proyectos/WebMueblesFercho/src/app/api/sets/[id]\")",
+      "Bash(mkdir -p \"C:/Users/luis-/Documents/Proyectos/WebMueblesFercho/src/app/\\(admin\\)/admin/sets/[id]\")"
     ]
   }
 }

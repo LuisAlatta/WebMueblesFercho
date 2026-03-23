@@ -8,10 +8,10 @@ import { cn } from "@/lib/utils";
 import SearchBar from "./SearchBar";
 
 const navLinks = [
+  { href: "/", label: "Home" },
+  { href: "/nosotros", label: "Nosotros" },
   { href: "/catalogo", label: "Catálogo" },
   { href: "/galeria", label: "Galería" },
-  { href: "/como-trabajamos", label: "Cómo trabajamos" },
-  { href: "/nosotros", label: "Nosotros" },
   { href: "/contacto", label: "Contacto" },
 ];
 
@@ -23,70 +23,101 @@ export default function Navbar({ businessName }: { businessName: string }) {
   const searchRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
+    const onScroll = () => setScrolled(window.scrollY > 30);
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  useEffect(() => { setMenuOpen(false); }, [pathname]);
+  useEffect(() => { setMenuOpen(false); setSearchOpen(false); }, [pathname]);
+
+  // Close search on outside click
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        setSearchOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
 
   return (
     <header
       className={cn(
-        "sticky top-0 z-50 bg-white transition-shadow duration-300",
-        scrolled ? "shadow-sm" : "border-b border-gray-100"
+        "sticky top-0 z-50 transition-shadow duration-300",
+        scrolled ? "shadow-lg" : ""
       )}
+      style={{
+        backgroundImage: "url('/images/wood-header-bg.png')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      }}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+      <div className="max-w-7xl mx-auto px-6 h-[72px] flex items-center justify-between gap-8">
+
         {/* Logo */}
         <Link href="/" className="shrink-0">
           <span
-            className="text-xl font-bold text-[#1C1C1E]"
+            className="block text-xl font-bold text-white leading-tight drop-shadow-sm"
             style={{ fontFamily: "var(--font-playfair)" }}
           >
             {businessName}
           </span>
+          <span className="block text-[10px] text-white/70 uppercase tracking-[0.2em] font-medium">
+            Fabricación a medida
+          </span>
         </Link>
 
         {/* Nav desktop */}
-        <nav className="hidden md:flex items-center gap-6">
-          {navLinks.map((l) => (
-            <Link
-              key={l.href}
-              href={l.href}
-              className={cn(
-                "text-sm transition-colors",
-                pathname.startsWith(l.href)
-                  ? "text-[#1C1C1E] font-medium"
-                  : "text-[#7A7A7A] hover:text-[#1C1C1E]"
-              )}
-            >
-              {l.label}
-            </Link>
-          ))}
+        <nav className="hidden md:flex items-center gap-0">
+          {navLinks.map((l) => {
+            const isActive = l.href === "/" ? pathname === "/" : pathname.startsWith(l.href);
+            return (
+              <Link
+                key={l.href}
+                href={l.href}
+                className={cn(
+                  "relative px-4 py-2 text-sm transition-colors duration-200 group drop-shadow-sm",
+                  isActive ? "text-white font-medium" : "text-white/75 hover:text-white"
+                )}
+              >
+                {l.label}
+                {/* Underline */}
+                <span
+                  className={cn(
+                    "absolute bottom-0 left-4 right-4 h-0.5 bg-[#C9A96E] transition-transform duration-300 origin-left",
+                    isActive ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
+                  )}
+                />
+              </Link>
+            );
+          })}
         </nav>
 
         {/* Actions */}
         <div className="flex items-center gap-2">
-          {/* Search toggle */}
+          {/* Search */}
           <div className="relative" ref={searchRef}>
             <button
               onClick={() => setSearchOpen(!searchOpen)}
-              className="p-2 text-[#7A7A7A] hover:text-[#1C1C1E] transition-colors rounded-lg hover:bg-gray-50"
+              aria-label="Buscar"
+              className="p-2 text-white/75 hover:text-white transition-colors drop-shadow-sm"
             >
               <Search className="w-5 h-5" />
             </button>
             {searchOpen && (
-              <div className="absolute right-0 top-full mt-2 w-72 bg-white rounded-xl shadow-lg border border-gray-100 p-2 z-50">
+              <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-200 p-2 z-50">
                 <SearchBar onClose={() => setSearchOpen(false)} />
               </div>
             )}
           </div>
 
-          {/* Mobile menu */}
+          {/* Mobile menu toggle */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="md:hidden p-2 text-[#7A7A7A] hover:text-[#1C1C1E] transition-colors rounded-lg hover:bg-gray-50"
+            aria-label="Menú"
+            className="md:hidden p-2 text-white/75 hover:text-white transition-colors drop-shadow-sm"
           >
             {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
@@ -95,22 +126,34 @@ export default function Navbar({ businessName }: { businessName: string }) {
 
       {/* Mobile menu */}
       {menuOpen && (
-        <div className="md:hidden border-t border-gray-100 bg-white px-4 py-4 space-y-1">
-          {navLinks.map((l) => (
+        <nav className="md:hidden border-t border-gray-100 bg-white px-6 py-4 space-y-1 shadow-lg">
+          {navLinks.map((l) => {
+            const isActive = l.href === "/" ? pathname === "/" : pathname.startsWith(l.href);
+            return (
+              <Link
+                key={l.href}
+                href={l.href}
+                className={cn(
+                  "flex items-center py-3 text-sm border-b border-gray-50 transition-colors",
+                  isActive
+                    ? "text-[#1C1C1E] font-semibold"
+                    : "text-[#777] hover:text-[#1C1C1E]"
+                )}
+              >
+                {isActive && <span className="w-1 h-4 bg-[#C9A96E] mr-3 rounded-full" />}
+                {l.label}
+              </Link>
+            );
+          })}
+          <div className="pt-3">
             <Link
-              key={l.href}
-              href={l.href}
-              className={cn(
-                "block px-3 py-2.5 rounded-lg text-sm transition-colors",
-                pathname.startsWith(l.href)
-                  ? "bg-[#FAF9F7] text-[#1C1C1E] font-medium"
-                  : "text-[#7A7A7A] hover:bg-[#FAF9F7] hover:text-[#1C1C1E]"
-              )}
+              href="/contacto"
+              className="block text-center bg-[#1C1C1E] text-white text-xs uppercase tracking-widest py-3 hover:bg-[#333] transition-colors"
             >
-              {l.label}
+              Pedir cotización
             </Link>
-          ))}
-        </div>
+          </div>
+        </nav>
       )}
     </header>
   );

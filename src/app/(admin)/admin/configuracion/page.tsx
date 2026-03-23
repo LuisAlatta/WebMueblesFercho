@@ -74,23 +74,23 @@ export default function ConfiguracionPage() {
   return (
     <>
       <AdminTopBar title="Configuración del sitio" />
-      <main className="flex-1 overflow-y-auto p-6">
+      <main className="flex-1 overflow-y-auto p-4 sm:p-6">
         <div className="max-w-2xl space-y-6">
 
           {/* Datos generales */}
-          <section className="bg-white rounded-xl border border-gray-100 p-6 space-y-4">
+          <section className="bg-white rounded-xl border border-gray-100 p-4 sm:p-6 space-y-4">
             <h2 className="font-semibold text-[#1C1C1E]">Datos del negocio</h2>
             <div className="space-y-2">
               <Label>Nombre del negocio</Label>
               <Input value={config.businessName} onChange={(e) => set("businessName", e.target.value)} />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Teléfono</Label>
                 <Input value={config.phone} onChange={(e) => set("phone", e.target.value)} placeholder="+54 11 1234-5678" />
               </div>
               <div className="space-y-2">
-                <Label>WhatsApp (solo números, con código de país)</Label>
+                <Label>WhatsApp <span className="font-normal text-[#7A7A7A]">(con código de país)</span></Label>
                 <Input value={config.whatsapp} onChange={(e) => set("whatsapp", e.target.value)} placeholder="5491112345678" />
               </div>
             </div>
@@ -105,7 +105,7 @@ export default function ConfiguracionPage() {
           </section>
 
           {/* Redes sociales */}
-          <section className="bg-white rounded-xl border border-gray-100 p-6 space-y-4">
+          <section className="bg-white rounded-xl border border-gray-100 p-4 sm:p-6 space-y-4">
             <h2 className="font-semibold text-[#1C1C1E]">Redes sociales</h2>
             <div className="space-y-2">
               <Label>Instagram (usuario sin @)</Label>
@@ -122,7 +122,7 @@ export default function ConfiguracionPage() {
           </section>
 
           {/* Banner promo */}
-          <section className="bg-white rounded-xl border border-gray-100 p-6 space-y-4">
+          <section className="bg-white rounded-xl border border-gray-100 p-4 sm:p-6 space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="font-semibold text-[#1C1C1E]">Banner de promoción</h2>
               <div className="flex items-center gap-2">

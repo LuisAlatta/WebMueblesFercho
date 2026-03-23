@@ -59,23 +59,31 @@ export default function EditProductoPage({ params }: { params: Promise<{ id: str
   const [historyVariant, setHistoryVariant] = useState<number | null>(null);
 
   async function load() {
-    const [prod, cats, mats, meds] = await Promise.all([
-      fetch(`/api/productos/${id}`).then((r) => r.json()),
-      fetch("/api/categorias").then((r) => r.json()),
-      fetch("/api/materiales").then((r) => r.json()),
-      fetch("/api/medidas").then((r) => r.json()),
-    ]);
-    setProduct(prod);
-    setCategories(cats);
-    setMaterials(mats);
-    setMeasurements(meds);
-    setForm({
-      name: prod.name, categoryId: String(prod.categoryId),
-      description: prod.description ?? "",
-      warrantyMonths: prod.warrantyMonths ? String(prod.warrantyMonths) : "",
-      productionDays: prod.productionDays ? String(prod.productionDays) : "",
-      isFeatured: prod.isFeatured, isActive: prod.isActive,
-    });
+    try {
+      const [prodRes, catsRes, matsRes, medsRes] = await Promise.all([
+        fetch(`/api/productos/${id}`),
+        fetch("/api/categorias"),
+        fetch("/api/materiales"),
+        fetch("/api/medidas"),
+      ]);
+      if (!prodRes.ok) { toast.error("Producto no encontrado"); return; }
+      const [prod, cats, mats, meds] = await Promise.all([
+        prodRes.json(), catsRes.json(), matsRes.json(), medsRes.json(),
+      ]);
+      setProduct(prod);
+      setCategories(cats);
+      setMaterials(mats);
+      setMeasurements(meds);
+      setForm({
+        name: prod.name, categoryId: String(prod.categoryId),
+        description: prod.description ?? "",
+        warrantyMonths: prod.warrantyMonths ? String(prod.warrantyMonths) : "",
+        productionDays: prod.productionDays ? String(prod.productionDays) : "",
+        isFeatured: prod.isFeatured, isActive: prod.isActive,
+      });
+    } catch {
+      toast.error("Error al cargar el producto");
+    }
   }
 
   useEffect(() => { load(); }, [id]);
@@ -129,20 +137,28 @@ export default function EditProductoPage({ params }: { params: Promise<{ id: str
   }
 
   async function updateVariantPrice(variantId: number, newPrice: string) {
-    await fetch(`/api/variantes/${variantId}`, {
+    const res = await fetch(`/api/variantes/${variantId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ price: parseFloat(newPrice) }),
     });
-    toast.success("Precio actualizado");
-    load();
+    if (res.ok) {
+      toast.success("Precio actualizado");
+      load();
+    } else {
+      toast.error("Error al actualizar el precio");
+    }
   }
 
   async function deleteVariant(variantId: number) {
     if (!confirm("¿Eliminar esta variante?")) return;
-    await fetch(`/api/variantes/${variantId}`, { method: "DELETE" });
-    toast.success("Variante eliminada");
-    load();
+    const res = await fetch(`/api/variantes/${variantId}`, { method: "DELETE" });
+    if (res.ok) {
+      toast.success("Variante eliminada");
+      load();
+    } else {
+      toast.error("Error al eliminar la variante");
+    }
   }
 
   if (!product) return (
@@ -155,7 +171,7 @@ export default function EditProductoPage({ params }: { params: Promise<{ id: str
   return (
     <>
       <AdminTopBar title={`Editar: ${product.name}`} />
-      <main className="flex-1 overflow-y-auto p-6 space-y-6">
+      <main className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-6">
         <Link href="/admin/productos" className="inline-flex items-center gap-1.5 text-sm text-[#7A7A7A] hover:text-[#1C1C1E] transition-colors">
           <ArrowLeft className="w-4 h-4" /> Volver a productos
         </Link>
@@ -163,7 +179,7 @@ export default function EditProductoPage({ params }: { params: Promise<{ id: str
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
           {/* Datos del producto */}
-          <form onSubmit={saveProduct} className="bg-white rounded-xl border border-gray-100 p-6 space-y-4">
+          <form onSubmit={saveProduct} className="bg-white rounded-xl border border-gray-100 p-4 sm:p-6 space-y-4">
             <h2 className="font-semibold text-[#1C1C1E]">Datos del producto</h2>
 
             <div className="space-y-2">
@@ -219,7 +235,7 @@ export default function EditProductoPage({ params }: { params: Promise<{ id: str
           </form>
 
           {/* Variantes */}
-          <div className="bg-white rounded-xl border border-gray-100 p-6 space-y-4">
+          <div className="bg-white rounded-xl border border-gray-100 p-4 sm:p-6 space-y-4">
             <h2 className="font-semibold text-[#1C1C1E]">Variantes / Precios</h2>
 
             {/* Tabla de variantes existentes */}
@@ -336,7 +352,7 @@ export default function EditProductoPage({ params }: { params: Promise<{ id: str
         </div>
 
         {/* Imágenes */}
-        <div className="bg-white rounded-xl border border-gray-100 p-6">
+        <div className="bg-white rounded-xl border border-gray-100 p-4 sm:p-6">
           <h2 className="font-semibold text-[#1C1C1E] mb-4">Imágenes del producto</h2>
           <ImageUpload productId={parseInt(id)} />
         </div>
