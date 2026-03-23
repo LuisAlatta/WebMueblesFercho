@@ -10,7 +10,30 @@
       "Bash(cp -r \"C:/Users/luis-/Documents/Proyectos/muebles-fercho-temp/.\" \"C:/Users/luis-/Documents/Proyectos/WebMueblesFercho/\")",
       "Bash(rm -rf \"C:/Users/luis-/Documents/Proyectos/muebles-fercho-temp\")",
       "Bash(npm install:*)",
-      "Bash(npx shadcn@latest init --defaults)"
+      "Bash(npx shadcn@latest init --defaults)",
+      "Bash(npx shadcn@latest add input label textarea select badge card dialog sheet table tabs separator dropdown-menu toast sonner skeleton avatar switch checkbox slider)",
+      "Bash(npx shadcn@latest add input label textarea select badge card dialog sheet table tabs separator dropdown-menu sonner skeleton avatar switch checkbox slider)",
+      "Bash(mkdir -p src/app/\\\\\\(catalog\\\\\\)/catalogo src/app/\\\\\\(catalog\\\\\\)/categoria/[slug] src/app/\\\\\\(catalog\\\\\\)/producto/[slug] src/app/\\\\\\(catalog\\\\\\)/nosotros src/app/\\\\\\(catalog\\\\\\)/como-trabajamos src/app/\\\\\\(catalog\\\\\\)/galeria src/app/\\\\\\(catalog\\\\\\)/faq src/app/\\\\\\(catalog\\\\\\)/contacto)",
+      "Bash(mkdir -p src/app/\\\\\\(admin\\\\\\)/admin/productos/nuevo src/app/\\\\\\(admin\\\\\\)/admin/productos/[id]/variantes src/app/\\\\\\(admin\\\\\\)/admin/categorias/nueva src/app/\\\\\\(admin\\\\\\)/admin/materiales src/app/\\\\\\(admin\\\\\\)/admin/medidas src/app/\\\\\\(admin\\\\\\)/admin/galeria src/app/\\\\\\(admin\\\\\\)/admin/testimonios src/app/\\\\\\(admin\\\\\\)/admin/faq src/app/\\\\\\(admin\\\\\\)/admin/sets src/app/\\\\\\(admin\\\\\\)/admin/configuracion)",
+      "Bash(mkdir -p src/app/api/auth/[...nextauth] src/app/api/productos/[id] src/app/api/categorias/[id] src/app/api/variantes/[id] src/app/api/materiales src/app/api/medidas src/app/api/galeria src/app/api/testimonios src/app/api/faq src/app/api/sets src/app/api/configuracion src/app/api/upload src/app/login)",
+      "Bash(mkdir -p src/components/catalog src/components/admin src/hooks src/types prisma public)",
+      "Bash(npx prisma:*)",
+      "Bash(npx tsc:*)",
+      "Bash(DATABASE_URL=\"postgresql://placeholder:placeholder@localhost:5432/placeholder\" DIRECT_URL=\"postgresql://placeholder:placeholder@localhost:5432/placeholder\" npx prisma generate)",
+      "Bash(DATABASE_URL=\"postgresql://placeholder:placeholder@localhost:5432/placeholder\" npx prisma generate)",
+      "Bash(timeout 10 npm run build)",
+      "mcp__supabase__list_organizations",
+      "mcp__supabase__get_cost",
+      "mcp__supabase__confirm_cost",
+      "mcp__supabase__create_project",
+      "mcp__supabase__get_project_url",
+      "mcp__supabase__apply_migration",
+      "mcp__supabase__execute_sql",
+      "Bash(openssl rand:*)",
+      "Bash(node -e \":*)",
+      "Bash(set -a)",
+      "Bash(source .env.local)",
+      "Bash(timeout 15 npm run dev)"
     ]
   }
 }
