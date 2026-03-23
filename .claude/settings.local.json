@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/luis-/Documents/Proyectos/**)",
+      "Bash(npx create-next-app@latest WebMueblesFercho --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --no-git)",
+      "Bash(npx create-next-app@latest muebles-fercho --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --no-git)",
+      "Bash(npx create-next-app@latest muebles-fercho --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --no-git --no-react-compiler)",
+      "Bash(printf \"n\\\\nn\\\\n\")",
+      "Bash(npx create-next-app@latest \"C:/Users/luis-/Documents/Proyectos/muebles-fercho-temp\" --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --no-git)",
+      "Bash(cp -r \"C:/Users/luis-/Documents/Proyectos/muebles-fercho-temp/.\" \"C:/Users/luis-/Documents/Proyectos/WebMueblesFercho/\")",
+      "Bash(rm -rf \"C:/Users/luis-/Documents/Proyectos/muebles-fercho-temp\")",
+      "Bash(npm install:*)",
+      "Bash(npx shadcn@latest init --defaults)"
+    ]
+  }
+}
