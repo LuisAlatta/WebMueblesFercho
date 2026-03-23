@@ -25,8 +25,7 @@ export default function ImageUpload({ productId }: Props) {
 
   async function loadImages() {
     const res = await fetch(`/api/productos/${productId}/imagenes`);
-    const data = await res.json();
-    setImages(data);
+    setImages(await res.json());
   }
 
   useEffect(() => { loadImages(); }, [productId]);
@@ -37,38 +36,18 @@ export default function ImageUpload({ productId }: Props) {
 
     for (const file of Array.from(files)) {
       try {
-        // 1. Get signed upload params from server
-        const sigRes = await fetch("/api/upload", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ folder: "muebles-fercho/productos" }),
-        });
-        const { timestamp, signature, cloudName, apiKey, folder } = await sigRes.json();
-
-        // 2. Upload directly to Cloudinary
         const formData = new FormData();
         formData.append("file", file);
-        formData.append("api_key", apiKey);
-        formData.append("timestamp", String(timestamp));
-        formData.append("signature", signature);
-        formData.append("folder", folder);
+        formData.append("folder", "productos");
 
-        const uploadRes = await fetch(
-          `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
-          { method: "POST", body: formData }
-        );
-        const uploaded = await uploadRes.json();
+        const res = await fetch("/api/upload", { method: "POST", body: formData });
+        if (!res.ok) { toast.error(`Error subiendo ${file.name}`); continue; }
+        const { url, path } = await res.json();
 
-        if (!uploaded.secure_url) {
-          toast.error(`Error subiendo ${file.name}`);
-          continue;
-        }
-
-        // 3. Save to DB
         await fetch(`/api/productos/${productId}/imagenes`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ url: uploaded.secure_url, publicId: uploaded.public_id as string }),
+          body: JSON.stringify({ url, publicId: path }),
         });
       } catch {
         toast.error(`Error subiendo ${file.name}`);
@@ -99,18 +78,10 @@ export default function ImageUpload({ productId }: Props) {
     });
   }
 
-  function onDragStart(index: number) {
-    dragItem.current = index;
-  }
-
-  function onDragEnter(index: number) {
-    dragOverItem.current = index;
-  }
-
+  function onDragStart(index: number) { dragItem.current = index; }
+  function onDragEnter(index: number) { dragOverItem.current = index; }
   function onDragEnd() {
-    if (dragItem.current === null || dragOverItem.current === null) return;
-    if (dragItem.current === dragOverItem.current) return;
-
+    if (dragItem.current === null || dragOverItem.current === null || dragItem.current === dragOverItem.current) return;
     const reordered = [...images];
     const [moved] = reordered.splice(dragItem.current, 1);
     reordered.splice(dragOverItem.current, 0, moved);
@@ -134,21 +105,11 @@ export default function ImageUpload({ productId }: Props) {
           disabled={uploading}
           className="inline-flex items-center gap-2 text-sm bg-[#1C1C1E] hover:bg-[#2C2C2E] text-white px-3 py-2 rounded-lg transition-colors disabled:opacity-50"
         >
-          {uploading ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
-          ) : (
-            <Upload className="w-4 h-4" />
-          )}
+          {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
           {uploading ? "Subiendo..." : "Subir imágenes"}
         </button>
-        <input
-          ref={inputRef}
-          type="file"
-          accept="image/*"
-          multiple
-          className="hidden"
-          onChange={(e) => handleFiles(e.target.files)}
-        />
+        <input ref={inputRef} type="file" accept="image/*" multiple className="hidden"
+          onChange={(e) => handleFiles(e.target.files)} />
       </div>
 
       {images.length > 0 && (
@@ -163,13 +124,7 @@ export default function ImageUpload({ productId }: Props) {
               onDragOver={(e) => e.preventDefault()}
               className="relative group rounded-lg overflow-hidden border border-gray-100 aspect-square bg-gray-50 cursor-grab active:cursor-grabbing"
             >
-              <Image
-                src={img.url}
-                alt="Imagen producto"
-                fill
-                className="object-cover"
-                sizes="150px"
-              />
+              <Image src={img.url} alt="Imagen producto" fill className="object-cover" sizes="150px" />
               {index === 0 && (
                 <span className="absolute top-1 left-1 text-xs bg-[#C9A96E] text-[#1C1C1E] px-1.5 py-0.5 rounded font-medium">
                   Principal
@@ -177,11 +132,8 @@ export default function ImageUpload({ productId }: Props) {
               )}
               <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                 <GripVertical className="w-5 h-5 text-white" />
-                <button
-                  type="button"
-                  onClick={() => deleteImage(img)}
-                  className="p-1 bg-red-500 rounded-full text-white hover:bg-red-600 transition-colors"
-                >
+                <button type="button" onClick={() => deleteImage(img)}
+                  className="p-1 bg-red-500 rounded-full text-white hover:bg-red-600 transition-colors">
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -191,11 +143,8 @@ export default function ImageUpload({ productId }: Props) {
       )}
 
       {images.length === 0 && !uploading && (
-        <button
-          type="button"
-          onClick={() => inputRef.current?.click()}
-          className="w-full border-2 border-dashed border-gray-200 rounded-xl py-10 text-center hover:border-[#C9A96E] transition-colors group"
-        >
+        <button type="button" onClick={() => inputRef.current?.click()}
+          className="w-full border-2 border-dashed border-gray-200 rounded-xl py-10 text-center hover:border-[#C9A96E] transition-colors group">
           <Upload className="w-8 h-8 text-gray-300 group-hover:text-[#C9A96E] mx-auto mb-2 transition-colors" />
           <p className="text-sm text-[#7A7A7A]">Hacé clic para subir imágenes</p>
           <p className="text-xs text-gray-400 mt-1">JPG, PNG, WEBP — múltiples archivos</p>

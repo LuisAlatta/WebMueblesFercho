@@ -35,7 +35,8 @@
       "Bash(source .env.local)",
       "Bash(timeout 15 npm run dev)",
       "Bash(timeout 12 npm run dev)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "mcp__supabase__get_publishable_keys"
     ]
   }
 }

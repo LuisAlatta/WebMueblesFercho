@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { deleteImage } from "@/lib/cloudinary";
+import { deleteStorageImage } from "@/lib/supabase-storage";
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -47,6 +47,6 @@ export async function DELETE(req: NextRequest) {
 
   const { id, publicId } = await req.json();
   await prisma.productImage.delete({ where: { id } });
-  if (publicId) await deleteImage(publicId).catch(() => {});
+  if (publicId) await deleteStorageImage(publicId).catch(() => {});
   return NextResponse.json({ success: true });
 }
