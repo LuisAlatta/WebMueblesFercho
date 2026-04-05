@@ -37,19 +37,6 @@ export default async function HomePage() {
 
   return (
     <div className="flex flex-col min-h-[calc(100dvh-72px)]">
-      {/* Mini hero / brand banner */}
-      <div className="bg-[#1C1C1E] px-5 py-6">
-        <p
-          className="text-white text-xl sm:text-2xl font-bold leading-tight"
-          style={{ fontFamily: "var(--font-playfair)" }}
-        >
-          Muebles a medida
-        </p>
-        <p className="text-white/50 text-sm mt-1">
-          Madera, MDF y melamina &middot; Fabricacion artesanal
-        </p>
-      </div>
-
       {/* Search bar - sticky below navbar */}
       <div className="sticky top-[72px] z-40 bg-white/95 backdrop-blur-md border-b border-gray-100 px-4 py-3">
         <HomeSearch />
