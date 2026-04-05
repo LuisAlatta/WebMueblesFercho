@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { prisma } from "@/lib/prisma";
 import HomeSearch from "@/components/catalog/HomeSearch";
+import { ArrowRight } from "lucide-react";
 
 export const revalidate = 3600;
 
@@ -23,30 +24,57 @@ function getCategoryImage(name: string): string | null {
 }
 
 export default async function HomePage() {
-  const categories = await prisma.category.findMany({
-    where: { isActive: true },
-    orderBy: { order: "asc" },
-    include: {
-      _count: { select: { products: { where: { isActive: true } } } },
-    },
-  });
+  const [categories, totalProducts] = await Promise.all([
+    prisma.category.findMany({
+      where: { isActive: true },
+      orderBy: { order: "asc" },
+      include: {
+        _count: { select: { products: { where: { isActive: true } } } },
+      },
+    }),
+    prisma.product.count({ where: { isActive: true } }),
+  ]);
 
   return (
     <div className="flex flex-col min-h-[calc(100dvh-72px)]">
+      {/* Mini hero / brand banner */}
+      <div className="bg-[#1C1C1E] px-5 py-6">
+        <p
+          className="text-white text-xl sm:text-2xl font-bold leading-tight"
+          style={{ fontFamily: "var(--font-playfair)" }}
+        >
+          Muebles a medida
+        </p>
+        <p className="text-white/50 text-sm mt-1">
+          Madera, MDF y melamina &middot; Fabricacion artesanal
+        </p>
+      </div>
+
       {/* Search bar - sticky below navbar */}
       <div className="sticky top-[72px] z-40 bg-white/95 backdrop-blur-md border-b border-gray-100 px-4 py-3">
         <HomeSearch />
       </div>
 
-      {/* Category grid */}
+      {/* Content */}
       <div className="flex-1 px-4 pt-5 pb-8">
-        <h1
-          className="text-lg font-bold text-[#1C1C1E] mb-4"
-          style={{ fontFamily: "var(--font-playfair)" }}
-        >
-          Categorias
-        </h1>
+        {/* Section header */}
+        <div className="flex items-end justify-between mb-4">
+          <h1
+            className="text-lg font-bold text-[#1C1C1E]"
+            style={{ fontFamily: "var(--font-playfair)" }}
+          >
+            Categorias
+          </h1>
+          <Link
+            href="/catalogo"
+            className="flex items-center gap-1 text-xs text-[#C9A96E] font-medium hover:text-[#b8965e] transition-colors"
+          >
+            Ver todo ({totalProducts})
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
 
+        {/* Category grid */}
         <div className="grid grid-cols-2 gap-3">
           {categories.map((cat) => {
             const img = cat.imageUrl || getCategoryImage(cat.name);
@@ -81,11 +109,12 @@ export default async function HomePage() {
                     {cat.name}
                   </h2>
                   <p className="text-white/70 text-xs mt-0.5">
-                    {cat._count.products} {cat._count.products === 1 ? "producto" : "productos"}
+                    {cat._count.products}{" "}
+                    {cat._count.products === 1 ? "producto" : "productos"}
                   </p>
                 </div>
 
-                {/* Subtle gold accent line at bottom */}
+                {/* Gold accent on hover */}
                 <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#C9A96E] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </Link>
             );
