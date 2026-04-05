@@ -8,10 +8,10 @@ import { cn } from "@/lib/utils";
 import SearchBar from "./SearchBar";
 
 const navLinks = [
-  { href: "/", label: "Home" },
+  { href: "/", label: "Inicio" },
+  { href: "/catalogo", label: "Catalogo" },
   { href: "/nosotros", label: "Nosotros" },
-  { href: "/catalogo", label: "Catálogo" },
-  { href: "/galeria", label: "Galería" },
+  { href: "/galeria", label: "Galeria" },
   { href: "/contacto", label: "Contacto" },
 ];
 
