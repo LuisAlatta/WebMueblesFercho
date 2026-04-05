@@ -11,6 +11,8 @@ import {
   Settings,
   UploadCloud,
   Images,
+  CheckCircle2,
+  XCircle,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -61,74 +63,74 @@ export default async function AdminDashboard() {
       label: "Total productos",
       value: data.totalProducts,
       icon: Package,
-      color: "bg-blue-500/10 text-blue-600",
-      iconBg: "bg-blue-500",
+      gradient: "from-blue-500 to-blue-600",
+      shadow: "shadow-blue-500/25",
       href: "/admin/productos",
     },
     {
-      label: "Productos activos",
+      label: "Activos",
       value: data.activeProducts,
       icon: TrendingUp,
-      color: "bg-emerald-500/10 text-emerald-600",
-      iconBg: "bg-emerald-500",
+      gradient: "from-emerald-500 to-emerald-600",
+      shadow: "shadow-emerald-500/25",
       href: "/admin/productos",
       subtext: data.totalProducts > 0
-        ? `${Math.round((data.activeProducts / data.totalProducts) * 100)}% del total`
+        ? `${Math.round((data.activeProducts / data.totalProducts) * 100)}%`
         : undefined,
     },
     {
       label: "Destacados",
       value: data.featuredProducts,
       icon: Eye,
-      color: "bg-amber-500/10 text-amber-600",
-      iconBg: "bg-amber-500",
+      gradient: "from-amber-500 to-orange-500",
+      shadow: "shadow-amber-500/25",
       href: "/admin/productos",
     },
     {
-      label: "Categorías activas",
+      label: "Categorías",
       value: data.totalCategories,
       icon: Tag,
-      color: "bg-purple-500/10 text-purple-600",
-      iconBg: "bg-purple-500",
+      gradient: "from-violet-500 to-purple-600",
+      shadow: "shadow-violet-500/25",
       href: "/admin/categorias",
     },
   ];
 
   const quickActions = [
-    { label: "Nuevo producto", href: "/admin/productos/nuevo", icon: Plus, primary: true },
-    { label: "Nueva categoría", href: "/admin/categorias/nueva", icon: Tag, primary: false },
-    { label: "Carga masiva", href: "/admin/carga-masiva", icon: UploadCloud, primary: false },
-    { label: "Galería", href: "/admin/galeria", icon: Images, primary: false },
-    { label: "Configuración", href: "/admin/configuracion", icon: Settings, primary: false },
+    { label: "Nuevo producto", href: "/admin/productos/nuevo", icon: Plus, gradient: "from-slate-800 to-slate-900", text: "text-white" },
+    { label: "Nueva categoría", href: "/admin/categorias/nueva", icon: Tag, gradient: "", text: "text-slate-700" },
+    { label: "Carga masiva", href: "/admin/carga-masiva", icon: UploadCloud, gradient: "", text: "text-slate-700" },
+    { label: "Galería", href: "/admin/galeria", icon: Images, gradient: "", text: "text-slate-700" },
+    { label: "Configuración", href: "/admin/configuracion", icon: Settings, gradient: "", text: "text-slate-700" },
   ];
 
   return (
     <>
       <AdminTopBar title="Dashboard" />
-      <main className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5">
+      <main className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-5">
 
         {/* Alertas */}
         {alerts > 0 && (
-          <div className="bg-amber-50 border border-amber-100 rounded-xl p-4 flex items-start gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
-            <div className="w-9 h-9 rounded-lg bg-amber-100 flex items-center justify-center shrink-0">
-              <AlertTriangle className="w-4.5 h-4.5 text-amber-600" />
+          <div className="bg-amber-50/80 border border-amber-200/50 rounded-2xl p-4 flex items-start gap-3">
+            <div className="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center shrink-0">
+              <AlertTriangle className="w-4 h-4 text-amber-600" />
             </div>
             <div>
-              <p className="font-medium text-amber-800 text-sm">
+              <p className="font-semibold text-amber-800 text-sm">
                 {alerts} {alerts === 1 ? "alerta pendiente" : "alertas pendientes"}
               </p>
               <ul className="mt-1 space-y-0.5">
                 {data.productsWithoutImages > 0 && (
                   <li className="text-amber-700 text-sm">
-                    <Link href="/admin/productos" className="underline underline-offset-2 hover:no-underline">
+                    <Link href="/admin/productos" className="underline underline-offset-2 decoration-amber-300 hover:decoration-amber-500">
                       {data.productsWithoutImages} producto{data.productsWithoutImages > 1 ? "s" : ""} sin imágenes
                     </Link>
                   </li>
                 )}
                 {data.productsWithoutVariants > 0 && (
                   <li className="text-amber-700 text-sm">
-                    <Link href="/admin/productos" className="underline underline-offset-2 hover:no-underline">
-                      {data.productsWithoutVariants} producto{data.productsWithoutVariants > 1 ? "s" : ""} sin variantes/precio
+                    <Link href="/admin/productos" className="underline underline-offset-2 decoration-amber-300 hover:decoration-amber-500">
+                      {data.productsWithoutVariants} producto{data.productsWithoutVariants > 1 ? "s" : ""} sin precio
                     </Link>
                   </li>
                 )}
@@ -137,7 +139,7 @@ export default async function AdminDashboard() {
           </div>
         )}
 
-        {/* Stats */}
+        {/* Stats - gradient cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {stats.map((stat) => {
             const Icon = stat.icon;
@@ -145,53 +147,55 @@ export default async function AdminDashboard() {
               <Link
                 key={stat.label}
                 href={stat.href}
-                className="group bg-white rounded-xl border border-gray-100 p-5 hover:shadow-lg hover:shadow-gray-100/50 hover:border-gray-200 transition-all duration-200"
+                className="group relative overflow-hidden rounded-2xl p-5 bg-white border border-slate-100 hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300 hover:-translate-y-0.5"
               >
-                <div className={`w-10 h-10 rounded-xl ${stat.color} flex items-center justify-center mb-3 group-hover:scale-105 transition-transform`}>
-                  <Icon className="w-5 h-5" />
+                <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${stat.gradient} ${stat.shadow} shadow-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                  <Icon className="w-5 h-5 text-white" />
                 </div>
-                <p className="text-2xl font-bold text-[#1C1C1E] tracking-tight">{stat.value}</p>
-                <p className="text-sm text-[#7A7A7A] mt-0.5">{stat.label}</p>
-                {stat.subtext && (
-                  <p className="text-xs text-[#7A7A7A]/70 mt-1">{stat.subtext}</p>
-                )}
+                <div className="flex items-end gap-2">
+                  <p className="text-3xl font-bold text-slate-800 tracking-tight">{stat.value}</p>
+                  {stat.subtext && (
+                    <span className="text-xs font-medium text-emerald-500 mb-1">{stat.subtext}</span>
+                  )}
+                </div>
+                <p className="text-xs text-slate-400 mt-1 font-medium uppercase tracking-wider">{stat.label}</p>
               </Link>
             );
           })}
         </div>
 
-        {/* Top productos + Estado del catálogo */}
+        {/* Content grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
 
           {/* Más vistos */}
-          <div className="bg-white rounded-xl border border-gray-100 p-5">
-            <h2 className="font-semibold text-[#1C1C1E] mb-4 flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-[#C9A96E]/10 flex items-center justify-center">
-                <Eye className="w-3.5 h-3.5 text-[#C9A96E]" />
+          <div className="bg-white rounded-2xl border border-slate-100 p-5">
+            <h2 className="font-semibold text-slate-800 mb-4 flex items-center gap-2.5 text-sm">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg shadow-amber-500/20 flex items-center justify-center">
+                <Eye className="w-3.5 h-3.5 text-white" />
               </div>
               Productos más vistos
             </h2>
             {data.topProducts.length === 0 ? (
-              <p className="text-sm text-[#7A7A7A] py-4 text-center">Aún no hay visitas registradas.</p>
+              <p className="text-sm text-slate-400 py-6 text-center">Aún no hay visitas registradas.</p>
             ) : (
-              <ul className="space-y-2">
+              <ul className="space-y-1">
                 {data.topProducts.map((p, i) => (
                   <li key={p.id}>
                     <Link
                       href={`/admin/productos/${p.id}`}
-                      className="flex items-center gap-3 p-2 -mx-2 rounded-lg hover:bg-[#FAF9F7] transition-colors group"
+                      className="flex items-center gap-3 p-2.5 -mx-2 rounded-xl hover:bg-slate-50 transition-colors group"
                     >
                       <span className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 ${
-                        i === 0 ? "bg-[#C9A96E]/15 text-[#C9A96E]" :
-                        i === 1 ? "bg-gray-100 text-[#7A7A7A]" :
-                        "bg-gray-50 text-[#7A7A7A]/60"
+                        i === 0 ? "bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-sm" :
+                        i === 1 ? "bg-slate-100 text-slate-500" :
+                        "bg-slate-50 text-slate-400"
                       }`}>
                         {i + 1}
                       </span>
-                      <span className="flex-1 text-sm text-[#2C2C2C] group-hover:text-[#C9A96E] transition-colors truncate">
+                      <span className="flex-1 text-sm text-slate-600 group-hover:text-slate-900 transition-colors truncate">
                         {p.name}
                       </span>
-                      <span className="text-xs text-[#7A7A7A] tabular-nums">{p.viewCount} vis.</span>
+                      <span className="text-xs text-slate-400 tabular-nums font-medium">{p.viewCount}</span>
                     </Link>
                   </li>
                 ))}
@@ -200,98 +204,84 @@ export default async function AdminDashboard() {
           </div>
 
           {/* Estado del catálogo */}
-          <div className="bg-white rounded-xl border border-gray-100 p-5">
-            <h2 className="font-semibold text-[#1C1C1E] mb-4 flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-[#C9A96E]/10 flex items-center justify-center">
-                <AlertTriangle className="w-3.5 h-3.5 text-[#C9A96E]" />
+          <div className="bg-white rounded-2xl border border-slate-100 p-5">
+            <h2 className="font-semibold text-slate-800 mb-4 flex items-center gap-2.5 text-sm">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 shadow-lg shadow-violet-500/20 flex items-center justify-center">
+                <Package className="w-3.5 h-3.5 text-white" />
               </div>
               Estado del catálogo
             </h2>
             <div className="space-y-4">
-              {/* Sin imágenes */}
+              {/* Imágenes */}
               <div className="flex items-center gap-3">
-                <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
+                <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
                   data.productsWithoutImages === 0 ? "bg-emerald-50" : "bg-red-50"
                 }`}>
-                  <ImageOff className={`w-4 h-4 ${data.productsWithoutImages === 0 ? "text-emerald-500" : "text-red-500"}`} />
+                  {data.productsWithoutImages === 0
+                    ? <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                    : <XCircle className="w-4 h-4 text-red-500" />}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-[#2C2C2C]">Imágenes</p>
-                  <p className="text-xs text-[#7A7A7A]">
-                    {data.productsWithoutImages === 0
-                      ? "Todos los productos tienen imagen"
-                      : `${data.productsWithoutImages} sin imagen`}
-                  </p>
-                </div>
-                {data.totalProducts > 0 && (
-                  <div className="text-right shrink-0">
-                    <p className={`text-sm font-bold ${data.productsWithoutImages === 0 ? "text-emerald-600" : "text-red-500"}`}>
-                      {Math.round(((data.totalProducts - data.productsWithoutImages) / data.totalProducts) * 100)}%
-                    </p>
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium text-slate-700">Imágenes</p>
+                    {data.totalProducts > 0 && (
+                      <span className={`text-xs font-bold ${data.productsWithoutImages === 0 ? "text-emerald-500" : "text-red-500"}`}>
+                        {Math.round(((data.totalProducts - data.productsWithoutImages) / data.totalProducts) * 100)}%
+                      </span>
+                    )}
                   </div>
-                )}
+                  {data.totalProducts > 0 && (
+                    <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden mt-1.5">
+                      <div
+                        className={`h-full rounded-full transition-all duration-700 ${
+                          data.productsWithoutImages === 0 ? "bg-emerald-500" : "bg-red-400"
+                        }`}
+                        style={{ width: `${((data.totalProducts - data.productsWithoutImages) / data.totalProducts) * 100}%` }}
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
 
-              {/* Barra de progreso - imágenes */}
-              {data.totalProducts > 0 && (
-                <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden -mt-2">
-                  <div
-                    className={`h-full rounded-full transition-all duration-500 ${
-                      data.productsWithoutImages === 0 ? "bg-emerald-500" : "bg-red-400"
-                    }`}
-                    style={{
-                      width: `${((data.totalProducts - data.productsWithoutImages) / data.totalProducts) * 100}%`,
-                    }}
-                  />
-                </div>
-              )}
-
-              {/* Sin variantes */}
+              {/* Variantes */}
               <div className="flex items-center gap-3">
-                <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
+                <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
                   data.productsWithoutVariants === 0 ? "bg-emerald-50" : "bg-red-50"
                 }`}>
-                  <Package className={`w-4 h-4 ${data.productsWithoutVariants === 0 ? "text-emerald-500" : "text-red-500"}`} />
+                  {data.productsWithoutVariants === 0
+                    ? <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                    : <XCircle className="w-4 h-4 text-red-500" />}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-[#2C2C2C]">Precios/variantes</p>
-                  <p className="text-xs text-[#7A7A7A]">
-                    {data.productsWithoutVariants === 0
-                      ? "Todos los productos tienen precio"
-                      : `${data.productsWithoutVariants} sin precio`}
-                  </p>
-                </div>
-                {data.totalProducts > 0 && (
-                  <div className="text-right shrink-0">
-                    <p className={`text-sm font-bold ${data.productsWithoutVariants === 0 ? "text-emerald-600" : "text-red-500"}`}>
-                      {Math.round(((data.totalProducts - data.productsWithoutVariants) / data.totalProducts) * 100)}%
-                    </p>
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium text-slate-700">Precios</p>
+                    {data.totalProducts > 0 && (
+                      <span className={`text-xs font-bold ${data.productsWithoutVariants === 0 ? "text-emerald-500" : "text-red-500"}`}>
+                        {Math.round(((data.totalProducts - data.productsWithoutVariants) / data.totalProducts) * 100)}%
+                      </span>
+                    )}
                   </div>
-                )}
+                  {data.totalProducts > 0 && (
+                    <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden mt-1.5">
+                      <div
+                        className={`h-full rounded-full transition-all duration-700 ${
+                          data.productsWithoutVariants === 0 ? "bg-emerald-500" : "bg-red-400"
+                        }`}
+                        style={{ width: `${((data.totalProducts - data.productsWithoutVariants) / data.totalProducts) * 100}%` }}
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
 
-              {/* Barra de progreso - variantes */}
-              {data.totalProducts > 0 && (
-                <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden -mt-2">
-                  <div
-                    className={`h-full rounded-full transition-all duration-500 ${
-                      data.productsWithoutVariants === 0 ? "bg-emerald-500" : "bg-red-400"
-                    }`}
-                    style={{
-                      width: `${((data.totalProducts - data.productsWithoutVariants) / data.totalProducts) * 100}%`,
-                    }}
-                  />
-                </div>
-              )}
-
               {/* Galería */}
-              <div className="flex items-center gap-3 pt-1">
-                <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 bg-blue-50">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 bg-blue-50">
                   <Images className="w-4 h-4 text-blue-500" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-[#2C2C2C]">Galería</p>
-                  <p className="text-xs text-[#7A7A7A]">{data.totalGallery} foto{data.totalGallery !== 1 ? "s" : ""}</p>
+                  <p className="text-sm font-medium text-slate-700">Galería</p>
+                  <p className="text-xs text-slate-400 mt-0.5">{data.totalGallery} foto{data.totalGallery !== 1 ? "s" : ""}</p>
                 </div>
               </div>
             </div>
@@ -299,27 +289,26 @@ export default async function AdminDashboard() {
         </div>
 
         {/* Accesos rápidos */}
-        <div className="bg-white rounded-xl border border-gray-100 p-5">
-          <h2 className="font-semibold text-[#1C1C1E] mb-4">Accesos rápidos</h2>
+        <div className="bg-white rounded-2xl border border-slate-100 p-5">
+          <h2 className="font-semibold text-slate-800 mb-4 text-sm">Accesos rápidos</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
             {quickActions.map((action) => {
               const ActionIcon = action.icon;
+              const isPrimary = !!action.gradient;
               return (
                 <Link
                   key={action.href}
                   href={action.href}
-                  className={`group flex flex-col items-center gap-2 p-4 rounded-xl border transition-all duration-200 text-center ${
-                    action.primary
-                      ? "bg-[#1C1C1E] border-[#1C1C1E] text-white hover:bg-[#2C2C2E]"
-                      : "bg-white border-gray-100 text-[#1C1C1E] hover:border-[#C9A96E] hover:shadow-sm"
+                  className={`group flex flex-col items-center gap-2.5 p-4 rounded-xl border transition-all duration-200 text-center ${
+                    isPrimary && action.gradient
+                      ? `bg-gradient-to-br ${action.gradient} border-transparent ${action.text} hover:shadow-lg hover:shadow-slate-900/10 hover:-translate-y-0.5`
+                      : `bg-white border-slate-100 ${action.text} hover:border-slate-200 hover:shadow-md hover:shadow-slate-100/50 hover:-translate-y-0.5`
                   }`}
                 >
-                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110 ${
-                    action.primary
-                      ? "bg-white/10"
-                      : "bg-[#FAF9F7]"
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110 ${
+                    isPrimary && action.gradient ? "bg-white/10" : "bg-slate-50 group-hover:bg-slate-100"
                   }`}>
-                    <ActionIcon className="w-4.5 h-4.5" />
+                    <ActionIcon className="w-[18px] h-[18px]" />
                   </div>
                   <span className="text-xs font-medium">{action.label}</span>
                 </Link>

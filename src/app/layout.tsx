@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { Outfit, Playfair_Display } from "next/font/google";
+import { Space_Grotesk, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import GoogleAnalytics from "@/components/catalog/GoogleAnalytics";
 import { getSiteUrl } from "@/lib/siteUrl";
 
-const outfit = Outfit({
-  variable: "--font-outfit",
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-sans",
   subsets: ["latin"],
   display: "swap",
 });
@@ -34,10 +34,10 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${outfit.variable} ${playfair.variable} h-full antialiased`}
+      className={`${spaceGrotesk.variable} ${playfair.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col bg-background text-foreground font-[var(--font-outfit)]">
+      <body className="min-h-full flex flex-col bg-background text-foreground font-[var(--font-sans)]">
         <GoogleAnalytics />
         {children}
       </body>
