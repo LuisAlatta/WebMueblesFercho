@@ -24,7 +24,7 @@ export default function ProductCard({
   return (
     <Link href={`/producto/${slug}`} className="group block overflow-hidden bg-[#f0ece6]">
       {/* Imagen */}
-      <div className="relative aspect-square overflow-hidden">
+      <div className="relative aspect-[3/5] overflow-hidden">
         {img ? (
           <Image
             src={img.url}

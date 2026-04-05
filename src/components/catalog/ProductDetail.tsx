@@ -100,7 +100,7 @@ export default function ProductDetail({ product, related }: { product: Product; 
         <div>
           {/* Imagen principal */}
           <div
-            className="relative aspect-[4/3] bg-gray-50 rounded-2xl overflow-hidden cursor-zoom-in mb-3"
+            className="relative aspect-[3/5] bg-gray-50 rounded-2xl overflow-hidden cursor-zoom-in mb-3"
             onClick={() => setLightbox(true)}
           >
             {product.images[selectedImage] ? (

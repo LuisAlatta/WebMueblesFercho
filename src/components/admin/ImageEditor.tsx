@@ -20,9 +20,9 @@ interface ImageEditorProps {
 }
 
 const ASPECT_OPTIONS = [
-  { label: "1:1", value: 1, icon: Square },
-  { label: "4:3", value: 4 / 3, icon: RectangleHorizontal },
-  { label: "Libre", value: 0, icon: Maximize },
+  { label: "3:5", value: 3 / 5, icon: RectangleHorizontal, hint: "Catálogo" },
+  { label: "1:1", value: 1, icon: Square, hint: "" },
+  { label: "Libre", value: 0, icon: Maximize, hint: "" },
 ] as const;
 
 /** Crop the image on a canvas and return a Blob. */
@@ -93,7 +93,7 @@ export default function ImageEditor({ open, onOpenChange, imageUrl, onSave }: Im
   const [zoom, setZoom] = useState(1);
   const [rotation, setRotation] = useState(0);
   const [croppedArea, setCroppedArea] = useState<Area | null>(null);
-  const [aspect, setAspect] = useState<number>(1);
+  const [aspect, setAspect] = useState<number>(3 / 5);
   const [saving, setSaving] = useState(false);
 
   const onCropComplete = useCallback((_: Area, croppedAreaPixels: Area) => {
@@ -105,7 +105,7 @@ export default function ImageEditor({ open, onOpenChange, imageUrl, onSave }: Im
     setZoom(1);
     setRotation(0);
     setCroppedArea(null);
-    setAspect(1);
+    setAspect(3 / 5);
   }
 
   async function handleSave() {
@@ -169,6 +169,11 @@ export default function ImageEditor({ open, onOpenChange, imageUrl, onSave }: Im
                   >
                     <Icon className="w-3.5 h-3.5" />
                     {opt.label}
+                    {opt.hint && (
+                      <span className={`text-[10px] ${isActive ? "text-slate-400" : "text-slate-400"}`}>
+                        ({opt.hint})
+                      </span>
+                    )}
                   </button>
                 );
               })}
