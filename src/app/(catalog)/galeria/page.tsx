@@ -1,15 +1,30 @@
 import { prisma } from "@/lib/prisma";
 import { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 
-export const metadata: Metadata = { title: "Galería de trabajos" };
-export const revalidate = 60;
+export const metadata: Metadata = { title: "Galeria" };
+export const revalidate = 3600;
+
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
 
 export default async function GaleriaPage() {
-  const photos = await prisma.galleryPhoto.findMany({
-    where: { isActive: true },
+  const productImages = await prisma.productImage.findMany({
+    where: { product: { isActive: true } },
+    include: {
+      product: { select: { name: true, slug: true, category: { select: { name: true } } } },
+    },
     orderBy: { order: "asc" },
   });
+
+  const photos = shuffle(productImages);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16">
@@ -26,28 +41,30 @@ export default async function GaleriaPage() {
       </div>
 
       {photos.length > 0 ? (
-        <div className="columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
+        <div className="columns-2 md:columns-3 lg:columns-4 gap-3 space-y-3">
           {photos.map((photo) => (
-            <div key={photo.id} className="break-inside-avoid rounded-xl overflow-hidden bg-gray-100 group relative">
+            <Link
+              key={photo.id}
+              href={`/producto/${photo.product.slug}`}
+              className="break-inside-avoid rounded-xl overflow-hidden bg-gray-100 group relative block"
+            >
               <Image
                 src={photo.url}
-                alt={photo.title ?? "Trabajo terminado"}
+                alt={photo.altText ?? photo.product.name}
                 width={400}
-                height={300}
+                height={500}
                 className="w-full h-auto object-cover"
               />
-              {photo.title && (
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <p className="text-white text-sm font-medium">{photo.title}</p>
-                  {photo.description && <p className="text-white/70 text-xs">{photo.description}</p>}
-                </div>
-              )}
-            </div>
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                <p className="text-white text-sm font-medium line-clamp-1">{photo.product.name}</p>
+                <p className="text-white/60 text-xs">{photo.product.category.name}</p>
+              </div>
+            </Link>
           ))}
         </div>
       ) : (
         <div className="text-center py-20 text-[#7A7A7A]">
-          <p>Próximamente fotos de nuestros trabajos.</p>
+          <p>Proximamente fotos de nuestros trabajos.</p>
         </div>
       )}
     </div>
