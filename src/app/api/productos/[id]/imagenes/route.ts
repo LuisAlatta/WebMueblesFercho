@@ -41,6 +41,29 @@ export async function PUT(req: NextRequest) {
   return NextResponse.json({ success: true });
 }
 
+export async function PATCH(req: NextRequest) {
+  const session = await getServerSession(authOptions);
+  if (!session) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+
+  const { id, url, publicId, oldPublicId } = await req.json();
+  if (!id || !url || !publicId) {
+    return NextResponse.json({ error: "id, url y publicId requeridos" }, { status: 400 });
+  }
+
+  // Update the image record with new URL and path
+  const image = await prisma.productImage.update({
+    where: { id },
+    data: { url, publicId },
+  });
+
+  // Delete old file from storage (fire and forget)
+  if (oldPublicId) {
+    deleteStorageImage(oldPublicId).catch(() => {});
+  }
+
+  return NextResponse.json(image);
+}
+
 export async function DELETE(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "No autorizado" }, { status: 401 });

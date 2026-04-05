@@ -2,8 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { Loader2, Trash2, Upload, GripVertical } from "lucide-react";
+import { Loader2, Trash2, Upload, GripVertical, Crop } from "lucide-react";
 import { toast } from "sonner";
+import ConfirmDialog, { useConfirmDialog } from "@/components/admin/ConfirmDialog";
+import ImageEditor from "@/components/admin/ImageEditor";
 
 interface ProductImage {
   id: number;
@@ -19,9 +21,11 @@ interface Props {
 export default function ImageUpload({ productId }: Props) {
   const [images, setImages] = useState<ProductImage[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [editingImage, setEditingImage] = useState<ProductImage | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const dragItem = useRef<number | null>(null);
   const dragOverItem = useRef<number | null>(null);
+  const { confirm, dialogProps } = useConfirmDialog();
 
   async function loadImages() {
     const res = await fetch(`/api/productos/${productId}/imagenes`);
@@ -59,15 +63,57 @@ export default function ImageUpload({ productId }: Props) {
     toast.success("Imágenes subidas");
   }
 
-  async function deleteImage(img: ProductImage) {
-    if (!confirm("¿Eliminar esta imagen?")) return;
-    await fetch(`/api/productos/${productId}/imagenes`, {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: img.id, publicId: img.publicId }),
+  function deleteImage(img: ProductImage) {
+    confirm({
+      title: "Eliminar imagen",
+      description: "Esta acción no se puede deshacer.",
+      confirmLabel: "Eliminar",
+      variant: "danger",
+      onConfirm: async () => {
+        await fetch(`/api/productos/${productId}/imagenes`, {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: img.id, publicId: img.publicId }),
+        });
+        toast.success("Imagen eliminada");
+        loadImages();
+      },
     });
-    toast.success("Imagen eliminada");
-    loadImages();
+  }
+
+  async function handleEditSave(blob: Blob) {
+    if (!editingImage) return;
+
+    // 1. Upload the new cropped image
+    const formData = new FormData();
+    formData.append("file", blob, "edited.jpg");
+    formData.append("folder", "productos");
+
+    const uploadRes = await fetch("/api/upload", { method: "POST", body: formData });
+    if (!uploadRes.ok) {
+      toast.error("Error subiendo imagen editada");
+      return;
+    }
+    const { url, path } = await uploadRes.json();
+
+    // 2. Replace the image record (update URL + delete old file)
+    const replaceRes = await fetch(`/api/productos/${productId}/imagenes`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id: editingImage.id,
+        url,
+        publicId: path,
+        oldPublicId: editingImage.publicId,
+      }),
+    });
+
+    if (replaceRes.ok) {
+      toast.success("Imagen editada");
+      loadImages();
+    } else {
+      toast.error("Error al guardar imagen editada");
+    }
   }
 
   async function saveOrder(reordered: ProductImage[]) {
@@ -132,8 +178,16 @@ export default function ImageUpload({ productId }: Props) {
               )}
               <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                 <GripVertical className="w-5 h-5 text-white" />
+                <button
+                  type="button"
+                  onClick={() => setEditingImage(img)}
+                  className="p-1.5 bg-white/90 rounded-full text-slate-700 hover:bg-white transition-colors"
+                  title="Editar imagen"
+                >
+                  <Crop className="w-3.5 h-3.5" />
+                </button>
                 <button type="button" onClick={() => deleteImage(img)}
-                  className="p-1 bg-red-500 rounded-full text-white hover:bg-red-600 transition-colors">
+                  className="p-1.5 bg-red-500 rounded-full text-white hover:bg-red-600 transition-colors">
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -150,6 +204,18 @@ export default function ImageUpload({ productId }: Props) {
           <p className="text-xs text-gray-400 mt-1">JPG, PNG, WEBP — múltiples archivos</p>
         </button>
       )}
+
+      {/* Image editor modal */}
+      {editingImage && (
+        <ImageEditor
+          open={!!editingImage}
+          onOpenChange={(open) => { if (!open) setEditingImage(null); }}
+          imageUrl={editingImage.url}
+          onSave={handleEditSave}
+        />
+      )}
+
+      <ConfirmDialog {...dialogProps} />
     </div>
   );
 }
