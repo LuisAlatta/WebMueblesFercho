@@ -1,7 +1,8 @@
 import { MetadataRoute } from "next";
+import { getSiteUrl } from "@/lib/siteUrl";
 
 export default function robots(): MetadataRoute.Robots {
-  const base = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
+  const base = getSiteUrl();
   return {
     rules: [
       { userAgent: "*", allow: "/", disallow: ["/admin", "/api", "/login"] },

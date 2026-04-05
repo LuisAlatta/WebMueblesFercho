@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import GoogleAnalytics from "@/components/catalog/GoogleAnalytics";
+import { getSiteUrl } from "@/lib/siteUrl";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -22,9 +23,7 @@ export const metadata: Metadata = {
   },
   description:
     "Fabricamos muebles de madera, melamina y MDF a medida. Calidad artesanal, precios accesibles. Contactanos por WhatsApp.",
-  metadataBase: new URL(
-    process.env.NEXTAUTH_URL ?? "http://localhost:3000"
-  ),
+  metadataBase: new URL(getSiteUrl()),
 };
 
 export default function RootLayout({

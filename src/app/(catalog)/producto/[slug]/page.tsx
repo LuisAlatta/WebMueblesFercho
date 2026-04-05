@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import ProductDetail from "@/components/catalog/ProductDetail";
+import { getSiteUrl } from "@/lib/siteUrl";
 
 export const revalidate = 60;
 
@@ -61,7 +62,7 @@ export default async function ProductoPage({ params }: { params: Promise<{ slug:
   });
   const related = rawRelated.map((p) => ({ ...p, variants: p.variants.map((v) => ({ price: Number(v.price) })) }));
 
-  const base = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
+  const base = getSiteUrl();
   const minPrice = productSerialized.variants[0]?.price;
 
   const jsonLd = {
