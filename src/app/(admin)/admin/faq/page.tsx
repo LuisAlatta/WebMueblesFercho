@@ -6,8 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, Trash2, Loader2, Pencil, Check, X } from "lucide-react";
+import { Plus, Trash2, Loader2, Pencil, Check, X, HelpCircle } from "lucide-react";
 import { toast } from "sonner";
+import { motion, AnimatePresence } from "framer-motion";
+import ConfirmDialog, { useConfirmDialog } from "@/components/admin/ConfirmDialog";
+import EmptyState from "@/components/admin/EmptyState";
 
 interface Faq { id: number; question: string; answer: string; order: number; isActive: boolean; }
 
@@ -17,6 +20,7 @@ export default function FaqPage() {
   const [form, setForm] = useState({ question: "", answer: "" });
   const [editing, setEditing] = useState<Faq | null>(null);
   const [saving, setSaving] = useState(false);
+  const { confirm, dialogProps } = useConfirmDialog();
 
   async function load() {
     setLoading(true);
@@ -75,19 +79,26 @@ export default function FaqPage() {
     }
   }
 
-  async function remove(id: number) {
-    if (!confirm("¿Eliminar esta FAQ?")) return;
-    const res = await fetch("/api/faq", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id }),
+  function remove(id: number) {
+    confirm({
+      title: "Eliminar pregunta",
+      description: "Esta accion no se puede deshacer.",
+      confirmLabel: "Eliminar",
+      variant: "danger",
+      onConfirm: async () => {
+        const res = await fetch("/api/faq", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id }),
+        });
+        if (res.ok) {
+          toast.success("FAQ eliminada");
+          load();
+        } else {
+          toast.error("Error al eliminar la pregunta");
+        }
+      },
     });
-    if (res.ok) {
-      toast.success("FAQ eliminada");
-      load();
-    } else {
-      toast.error("Error al eliminar la pregunta");
-    }
   }
 
   return (
@@ -104,7 +115,7 @@ export default function FaqPage() {
               <Input
                 value={form.question}
                 onChange={(e) => setForm((p) => ({ ...p, question: e.target.value }))}
-                placeholder="¿Cuánto tiempo tarda la fabricación?"
+                placeholder="¿Cuanto tiempo tarda la fabricacion?"
               />
             </div>
             <div className="space-y-2">
@@ -113,7 +124,7 @@ export default function FaqPage() {
                 value={form.answer}
                 onChange={(e) => setForm((p) => ({ ...p, answer: e.target.value }))}
                 rows={3}
-                placeholder="Nuestros tiempos de fabricación..."
+                placeholder="Nuestros tiempos de fabricacion..."
               />
             </div>
             <Button
@@ -133,72 +144,86 @@ export default function FaqPage() {
               <div className="flex justify-center py-8">
                 <Loader2 className="w-5 h-5 animate-spin text-[#7A7A7A]" />
               </div>
+            ) : faqs.length === 0 ? (
+              <EmptyState
+                icon={HelpCircle}
+                title="No hay preguntas"
+                description="Agrega tu primera pregunta frecuente."
+              />
             ) : (
               <ul className="space-y-3">
-                {faqs.map((faq) => (
-                  <li key={faq.id} className="p-3 rounded-lg border border-gray-100 bg-[#FAF9F7]">
-                    {editing?.id === faq.id ? (
-                      <div className="space-y-2">
-                        <Input
-                          value={editing.question}
-                          onChange={(e) => setEditing({ ...editing, question: e.target.value })}
-                        />
-                        <Textarea
-                          value={editing.answer}
-                          onChange={(e) => setEditing({ ...editing, answer: e.target.value })}
-                          rows={2}
-                        />
-                        <div className="flex gap-2">
-                          <Button
-                            size="sm"
-                            onClick={save}
-                            disabled={saving}
-                            className="h-7 bg-[#1C1C1E] text-white hover:bg-[#2C2C2E]"
-                          >
-                            {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => setEditing(null)}
-                            className="h-7"
-                          >
-                            <X className="w-3.5 h-3.5" />
-                          </Button>
+                <AnimatePresence mode="popLayout">
+                  {faqs.map((faq, index) => (
+                    <motion.li
+                      key={faq.id}
+                      initial={{ opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8, transition: { duration: 0.15 } }}
+                      transition={{ duration: 0.25, delay: index * 0.05 }}
+                      className="p-4 rounded-xl border border-gray-100 bg-[#FAF9F7] transition-shadow duration-200 hover:shadow-md"
+                    >
+                      {editing?.id === faq.id ? (
+                        <div className="space-y-2">
+                          <Input
+                            value={editing.question}
+                            onChange={(e) => setEditing({ ...editing, question: e.target.value })}
+                          />
+                          <Textarea
+                            value={editing.answer}
+                            onChange={(e) => setEditing({ ...editing, answer: e.target.value })}
+                            rows={2}
+                          />
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              onClick={save}
+                              disabled={saving}
+                              className="h-7 bg-[#1C1C1E] text-white hover:bg-[#2C2C2E]"
+                            >
+                              {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => setEditing(null)}
+                              className="h-7"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </Button>
+                          </div>
                         </div>
-                      </div>
-                    ) : (
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-[#1C1C1E]">{faq.question}</p>
-                          <p className="text-xs text-[#7A7A7A] mt-1 line-clamp-2">{faq.answer}</p>
+                      ) : (
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold text-[#1C1C1E]">{faq.question}</p>
+                            <p className="text-xs text-[#7A7A7A] mt-1.5 line-clamp-2 leading-relaxed">{faq.answer}</p>
+                          </div>
+                          <div className="flex gap-1.5 shrink-0">
+                            <button
+                              onClick={() => setEditing(faq)}
+                              className="text-[#7A7A7A] hover:text-[#1C1C1E] hover:bg-gray-100 transition-all duration-150 p-1.5 rounded-lg"
+                            >
+                              <Pencil className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              onClick={() => remove(faq.id)}
+                              className="text-red-400 hover:text-red-600 hover:bg-red-50 transition-all duration-150 p-1.5 rounded-lg"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
                         </div>
-                        <div className="flex gap-1 shrink-0">
-                          <button
-                            onClick={() => setEditing(faq)}
-                            className="text-[#7A7A7A] hover:text-[#1C1C1E] transition-colors p-1"
-                          >
-                            <Pencil className="w-3.5 h-3.5" />
-                          </button>
-                          <button
-                            onClick={() => remove(faq.id)}
-                            className="text-red-400 hover:text-red-600 transition-colors p-1"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </li>
-                ))}
-                {faqs.length === 0 && (
-                  <p className="text-sm text-[#7A7A7A] text-center py-4">Sin preguntas frecuentes</p>
-                )}
+                      )}
+                    </motion.li>
+                  ))}
+                </AnimatePresence>
               </ul>
             )}
           </div>
         </div>
       </main>
+
+      <ConfirmDialog {...dialogProps} />
     </>
   );
 }

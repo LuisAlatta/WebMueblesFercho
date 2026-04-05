@@ -8,6 +8,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Plus, Trash2, Loader2, Star } from "lucide-react";
 import { toast } from "sonner";
+import { motion, AnimatePresence } from "framer-motion";
+import ConfirmDialog, { useConfirmDialog } from "@/components/admin/ConfirmDialog";
+import EmptyState from "@/components/admin/EmptyState";
 
 interface Testimonial {
   id: number; clientName: string; text: string; rating: number;
@@ -19,6 +22,7 @@ export default function TestimoniosPage() {
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({ clientName: "", text: "", rating: "5" });
   const [saving, setSaving] = useState(false);
+  const { confirm, dialogProps } = useConfirmDialog();
 
   async function load() {
     setLoading(true);
@@ -67,19 +71,26 @@ export default function TestimoniosPage() {
     }
   }
 
-  async function remove(id: number) {
-    if (!confirm("¿Eliminar este testimonio?")) return;
-    const res = await fetch("/api/testimonios", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id }),
+  function remove(id: number) {
+    confirm({
+      title: "Eliminar testimonio",
+      description: "Esta accion no se puede deshacer.",
+      confirmLabel: "Eliminar",
+      variant: "danger",
+      onConfirm: async () => {
+        const res = await fetch("/api/testimonios", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id }),
+        });
+        if (res.ok) {
+          toast.success("Eliminado");
+          load();
+        } else {
+          toast.error("Error al eliminar");
+        }
+      },
     });
-    if (res.ok) {
-      toast.success("Eliminado");
-      load();
-    } else {
-      toast.error("Error al eliminar");
-    }
   }
 
   return (
@@ -94,7 +105,7 @@ export default function TestimoniosPage() {
               <Input
                 value={form.clientName}
                 onChange={(e) => setForm((p) => ({ ...p, clientName: e.target.value }))}
-                placeholder="María García"
+                placeholder="Maria Garcia"
               />
             </div>
             <div className="space-y-2">
@@ -107,25 +118,25 @@ export default function TestimoniosPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label>Rating (1–5 estrellas)</Label>
-              <div className="flex gap-2 items-center">
+              <Label>Rating (1-5 estrellas)</Label>
+              <div className="flex gap-1 items-center">
                 {[1, 2, 3, 4, 5].map((n) => (
                   <button
                     key={n}
                     type="button"
                     onClick={() => setForm((p) => ({ ...p, rating: String(n) }))}
-                    className="p-0.5"
+                    className="p-1 rounded-md transition-colors hover:bg-[#FAF9F7]"
                   >
                     <Star
-                      className={`w-6 h-6 transition-colors ${
+                      className={`w-7 h-7 transition-all duration-150 ${
                         n <= parseInt(form.rating)
-                          ? "text-[#C9A96E] fill-[#C9A96E]"
-                          : "text-gray-300"
+                          ? "text-[#C9A96E] fill-[#C9A96E] drop-shadow-sm"
+                          : "text-gray-200 hover:text-gray-300"
                       }`}
                     />
                   </button>
                 ))}
-                <span className="text-sm text-[#7A7A7A] ml-1">{form.rating}/5</span>
+                <span className="text-sm text-[#7A7A7A] ml-2 font-medium">{form.rating}/5</span>
               </div>
             </div>
             <Button
@@ -144,57 +155,73 @@ export default function TestimoniosPage() {
               <div className="flex justify-center py-8">
                 <Loader2 className="w-5 h-5 animate-spin text-[#7A7A7A]" />
               </div>
+            ) : items.length === 0 ? (
+              <EmptyState
+                icon={Star}
+                title="No hay testimonios"
+                description="Agrega tu primer testimonio de cliente."
+              />
             ) : (
               <ul className="space-y-3">
-                {items.map((item) => (
-                  <li
-                    key={item.id}
-                    className={`p-3 rounded-lg border ${
-                      item.isActive
-                        ? "border-gray-100 bg-[#FAF9F7]"
-                        : "border-gray-100 bg-gray-50 opacity-60"
-                    }`}
-                  >
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-[#1C1C1E]">{item.clientName}</p>
-                        <div className="flex gap-0.5 my-1">
-                          {Array.from({ length: 5 }).map((_, i) => (
-                            <Star
-                              key={i}
-                              className={`w-3 h-3 ${
-                                i < item.rating ? "text-[#C9A96E] fill-[#C9A96E]" : "text-gray-300"
-                              }`}
-                            />
-                          ))}
+                <AnimatePresence mode="popLayout">
+                  {items.map((item, index) => (
+                    <motion.li
+                      key={item.id}
+                      initial={{ opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8, transition: { duration: 0.15 } }}
+                      transition={{ duration: 0.25, delay: index * 0.05 }}
+                      className={`p-4 rounded-xl border transition-shadow duration-200 hover:shadow-md ${
+                        item.isActive
+                          ? "border-gray-100 bg-[#FAF9F7]"
+                          : "border-gray-200 bg-gray-50 opacity-60"
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-[#1C1C1E]">{item.clientName}</p>
+                          <div className="flex gap-0.5 my-1.5">
+                            {Array.from({ length: 5 }).map((_, i) => (
+                              <Star
+                                key={i}
+                                className={`w-3.5 h-3.5 transition-colors ${
+                                  i < item.rating
+                                    ? "text-[#C9A96E] fill-[#C9A96E]"
+                                    : "text-gray-200"
+                                }`}
+                              />
+                            ))}
+                            <span className="text-[10px] text-[#7A7A7A] ml-1.5 self-center">
+                              {item.rating}/5
+                            </span>
+                          </div>
+                          <p className="text-xs text-[#7A7A7A] line-clamp-2 leading-relaxed">{item.text}</p>
                         </div>
-                        <p className="text-xs text-[#7A7A7A] line-clamp-2">{item.text}</p>
+                        <div className="flex gap-1.5 shrink-0">
+                          <button
+                            onClick={() => toggle(item)}
+                            className="text-xs text-[#7A7A7A] hover:text-[#1C1C1E] px-2.5 py-1 rounded-lg bg-white border border-gray-200 hover:border-gray-300 transition-all duration-150 hover:shadow-sm"
+                          >
+                            {item.isActive ? "Ocultar" : "Mostrar"}
+                          </button>
+                          <button
+                            onClick={() => remove(item.id)}
+                            className="text-red-400 hover:text-red-600 hover:bg-red-50 transition-all duration-150 p-1.5 rounded-lg"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
                       </div>
-                      <div className="flex gap-1 shrink-0">
-                        <button
-                          onClick={() => toggle(item)}
-                          className="text-xs text-[#7A7A7A] hover:text-[#1C1C1E] px-2 py-1 rounded bg-white border border-gray-200 transition-colors"
-                        >
-                          {item.isActive ? "Ocultar" : "Mostrar"}
-                        </button>
-                        <button
-                          onClick={() => remove(item.id)}
-                          className="text-red-400 hover:text-red-600 transition-colors p-1"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-                  </li>
-                ))}
-                {items.length === 0 && (
-                  <p className="text-sm text-[#7A7A7A] text-center py-4">Sin testimonios</p>
-                )}
+                    </motion.li>
+                  ))}
+                </AnimatePresence>
               </ul>
             )}
           </div>
         </div>
       </main>
+
+      <ConfirmDialog {...dialogProps} />
     </>
   );
 }

@@ -1,13 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import AdminTopBar from "@/components/admin/AdminTopBar";
+import ConfirmDialog, { useConfirmDialog } from "@/components/admin/ConfirmDialog";
+import EmptyState from "@/components/admin/EmptyState";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Pencil, Trash2, ToggleLeft, ToggleRight, Loader2, Sofa } from "lucide-react";
+import { Plus, Pencil, Trash2, ToggleLeft, ToggleRight, Sofa } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
 import Image from "next/image";
+import { motion } from "framer-motion";
 
 interface ProductSet {
   id: number;
@@ -20,9 +24,59 @@ interface ProductSet {
   items: { id: number; product: { id: number; name: string } }[];
 }
 
+/* Skeleton for loading state */
+function SetsSkeleton() {
+  return (
+    <>
+      {/* Mobile skeleton */}
+      <div className="lg:hidden space-y-3">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="bg-white rounded-xl border border-gray-100 p-4 flex gap-3 animate-pulse">
+            <div className="w-14 h-14 rounded-lg bg-gray-200 shrink-0" />
+            <div className="flex-1 space-y-2 py-1">
+              <div className="h-4 bg-gray-200 rounded w-3/4" />
+              <div className="h-3 bg-gray-100 rounded w-1/2" />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop skeleton */}
+      <div className="hidden lg:block bg-white rounded-xl border border-gray-100 overflow-hidden">
+        <div className="bg-[#FAF9F7] border-b border-gray-100 px-5 py-3 flex gap-8">
+          <div className="h-4 bg-gray-200 rounded w-20 animate-pulse" />
+          <div className="h-4 bg-gray-200 rounded w-20 animate-pulse" />
+          <div className="h-4 bg-gray-200 rounded w-20 animate-pulse" />
+          <div className="h-4 bg-gray-200 rounded w-16 animate-pulse" />
+        </div>
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="px-5 py-3 flex items-center gap-6 border-b border-gray-50 animate-pulse">
+            <div className="flex items-center gap-3 flex-1">
+              <div className="w-10 h-10 rounded-lg bg-gray-200 shrink-0" />
+              <div className="space-y-1.5 flex-1">
+                <div className="h-4 bg-gray-200 rounded w-40" />
+                <div className="h-3 bg-gray-100 rounded w-28" />
+              </div>
+            </div>
+            <div className="h-5 bg-gray-200 rounded w-20" />
+            <div className="h-4 bg-gray-100 rounded w-24" />
+            <div className="h-5 bg-gray-200 rounded w-16" />
+            <div className="flex gap-2">
+              <div className="h-8 w-8 bg-gray-100 rounded" />
+              <div className="h-8 w-8 bg-gray-100 rounded" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+}
+
 export default function SetsPage() {
   const [sets, setSets] = useState<ProductSet[]>([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
+  const { confirm, dialogProps } = useConfirmDialog();
 
   async function load() {
     setLoading(true);
@@ -52,15 +106,22 @@ export default function SetsPage() {
     }
   }
 
-  async function remove(set: ProductSet) {
-    if (!confirm(`¿Eliminar el set "${set.name}"?`)) return;
-    const res = await fetch(`/api/sets/${set.id}`, { method: "DELETE" });
-    if (res.ok) {
-      toast.success("Set eliminado");
-      load();
-    } else {
-      toast.error("Error al eliminar");
-    }
+  function remove(set: ProductSet) {
+    confirm({
+      title: `¿Eliminar el set "${set.name}"?`,
+      description: "Esta acción no se puede deshacer. Los productos del set no serán eliminados.",
+      confirmLabel: "Eliminar",
+      variant: "danger",
+      onConfirm: async () => {
+        const res = await fetch(`/api/sets/${set.id}`, { method: "DELETE" });
+        if (res.ok) {
+          toast.success("Set eliminado");
+          load();
+        } else {
+          toast.error("Error al eliminar");
+        }
+      },
+    });
   }
 
   return (
@@ -82,25 +143,27 @@ export default function SetsPage() {
         </div>
 
         {loading ? (
-          <div className="flex justify-center py-12">
-            <Loader2 className="w-6 h-6 animate-spin text-[#7A7A7A]" />
-          </div>
+          <SetsSkeleton />
         ) : sets.length === 0 ? (
-          <div className="bg-white rounded-xl border border-gray-100 p-10 text-center">
-            <Sofa className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-            <p className="text-sm text-[#7A7A7A]">No hay sets creados aún.</p>
-            <Link href="/admin/sets/nuevo">
-              <Button className="mt-4 bg-[#1C1C1E] hover:bg-[#2C2C2E] text-white text-sm">
-                <Plus className="w-4 h-4 mr-2" /> Crear primer set
-              </Button>
-            </Link>
-          </div>
+          <EmptyState
+            icon={Sofa}
+            title="No hay sets creados aún"
+            description="Agrupa productos que combinan bien juntos para mostrarlos como set."
+            actionLabel="Crear primer set"
+            actionHref="/admin/sets/nuevo"
+          />
         ) : (
           <>
             {/* Mobile: cards */}
             <div className="lg:hidden space-y-3">
-              {sets.map((set) => (
-                <div key={set.id} className="bg-white rounded-xl border border-gray-100 p-4 flex gap-3">
+              {sets.map((set, index) => (
+                <motion.div
+                  key={set.id}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.25, delay: index * 0.05 }}
+                  className="bg-white rounded-xl border border-gray-100 p-4 flex gap-3"
+                >
                   <div className="w-14 h-14 rounded-lg bg-gray-100 overflow-hidden shrink-0 flex items-center justify-center">
                     {set.imageUrl ? (
                       <Image src={set.imageUrl} alt={set.name} width={56} height={56} className="object-cover w-full h-full" />
@@ -130,7 +193,7 @@ export default function SetsPage() {
                       </button>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
 
@@ -147,8 +210,15 @@ export default function SetsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
-                  {sets.map((set) => (
-                    <tr key={set.id} className="hover:bg-[#FAF9F7] transition-colors">
+                  {sets.map((set, index) => (
+                    <motion.tr
+                      key={set.id}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.2, delay: index * 0.04 }}
+                      className="hover:bg-[#FAF9F7] transition-colors cursor-pointer"
+                      onClick={() => router.push(`/admin/sets/${set.id}`)}
+                    >
                       <td className="px-5 py-3">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-lg bg-gray-100 overflow-hidden shrink-0 flex items-center justify-center">
@@ -169,7 +239,10 @@ export default function SetsPage() {
                         {set.items.length} producto{set.items.length !== 1 ? "s" : ""}
                       </td>
                       <td className="px-5 py-3">
-                        <button onClick={() => toggle(set)} className="flex items-center gap-1.5 text-sm">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); toggle(set); }}
+                          className="flex items-center gap-1.5 text-sm"
+                        >
                           {set.isActive
                             ? <><ToggleRight className="w-5 h-5 text-green-500" /><span className="text-green-600">Activo</span></>
                             : <><ToggleLeft className="w-5 h-5 text-gray-400" /><span className="text-gray-400">Inactivo</span></>}
@@ -177,15 +250,20 @@ export default function SetsPage() {
                       </td>
                       <td className="px-5 py-3">
                         <div className="flex items-center gap-2 justify-end">
-                          <Link href={`/admin/sets/${set.id}`}>
+                          <Link href={`/admin/sets/${set.id}`} onClick={(e) => e.stopPropagation()}>
                             <Button variant="ghost" size="sm" className="h-8 w-8 p-0"><Pencil className="w-3.5 h-3.5" /></Button>
                           </Link>
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-red-400 hover:text-red-600 hover:bg-red-50" onClick={() => remove(set)}>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0 text-red-400 hover:text-red-600 hover:bg-red-50"
+                            onClick={(e) => { e.stopPropagation(); remove(set); }}
+                          >
                             <Trash2 className="w-3.5 h-3.5" />
                           </Button>
                         </div>
                       </td>
-                    </tr>
+                    </motion.tr>
                   ))}
                 </tbody>
               </table>
@@ -193,6 +271,8 @@ export default function SetsPage() {
           </>
         )}
       </main>
+
+      <ConfirmDialog {...dialogProps} />
     </>
   );
 }
