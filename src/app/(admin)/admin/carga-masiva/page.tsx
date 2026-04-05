@@ -48,23 +48,22 @@ export default function CargaMasivaPage() {
       .catch(() => toast.error("Error cargando categorías"));
   }, []);
 
-  function fileNameToProductName(fileName: string): string {
-    const name = fileName.replace(/\.[^/.]+$/, ""); // remove extension
-    return name
-      .replace(/[-_]/g, " ")
-      .replace(/\s+/g, " ")
-      .trim()
-      .replace(/\b\w/g, (c) => c.toUpperCase());
+  function getCategoryName(): string {
+    if (!selectedCategoryId) return "Producto";
+    const cat = categories.find((c) => c.id === selectedCategoryId);
+    return cat?.name ?? "Producto";
   }
 
   function handleFiles(fileList: FileList | null) {
     if (!fileList) return;
+    const catName = getCategoryName();
+    const startIndex = files.length;
     const newEntries: FileEntry[] = Array.from(fileList)
       .filter((f) => f.type.startsWith("image/"))
-      .map((file) => ({
+      .map((file, i) => ({
         file,
         preview: URL.createObjectURL(file),
-        name: fileNameToProductName(file.name),
+        name: `${catName} ${String(startIndex + i + 1).padStart(2, "0")}`,
       }));
     setFiles((prev) => [...prev, ...newEntries]);
   }
@@ -78,6 +77,15 @@ export default function CargaMasivaPage() {
 
   function updateName(index: number, newName: string) {
     setFiles((prev) => prev.map((f, i) => (i === index ? { ...f, name: newName } : f)));
+  }
+
+  function renameAllFiles(catName: string) {
+    setFiles((prev) =>
+      prev.map((f, i) => ({
+        ...f,
+        name: `${catName} ${String(i + 1).padStart(2, "0")}`,
+      }))
+    );
   }
 
   async function createCategory() {
@@ -94,6 +102,7 @@ export default function CargaMasivaPage() {
       setCategories((prev) => [...prev, cat]);
       setSelectedCategoryId(cat.id);
       setNewCategoryName("");
+      if (files.length > 0) renameAllFiles(cat.name);
       toast.success(`Categoría "${cat.name}" creada`);
     } catch {
       toast.error("Error creando categoría");
@@ -216,9 +225,14 @@ export default function CargaMasivaPage() {
                 <Label>Categoría existente</Label>
                 <select
                   value={selectedCategoryId}
-                  onChange={(e) =>
-                    setSelectedCategoryId(e.target.value ? Number(e.target.value) : "")
-                  }
+                  onChange={(e) => {
+                    const id = e.target.value ? Number(e.target.value) : "";
+                    setSelectedCategoryId(id);
+                    if (id && files.length > 0) {
+                      const cat = categories.find((c) => c.id === id);
+                      if (cat) renameAllFiles(cat.name);
+                    }
+                  }}
                   className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C9A96E]/50"
                 >
                   <option value="">— Elegir categoría —</option>

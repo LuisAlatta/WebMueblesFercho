@@ -59,13 +59,8 @@ function slugify(text: string): string {
     .replace(/-+/g, "-");
 }
 
-function fileNameToProductName(fileName: string): string {
-  const name = path.parse(fileName).name;
-  return name
-    .replace(/[-_]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim()
-    .replace(/\b\w/g, (c) => c.toUpperCase());
+function productNameFromIndex(categoryName: string, index: number): string {
+  return `${categoryName} ${String(index + 1).padStart(2, "0")}`;
 }
 
 function getMimeType(ext: string): string {
@@ -203,7 +198,7 @@ async function main() {
     let errors = 0;
 
     const tasks = files.map((file, idx) => async () => {
-      const productName = fileNameToProductName(file);
+      const productName = productNameFromIndex(catName, idx);
       const slug = uniqueSlug(productName);
 
       try {
