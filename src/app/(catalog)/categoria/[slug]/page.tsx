@@ -5,7 +5,15 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Metadata } from "next";
 
-export const revalidate = 60;
+export const revalidate = 3600;
+
+export async function generateStaticParams() {
+  const categories = await prisma.category.findMany({
+    where: { isActive: true },
+    select: { slug: true },
+  });
+  return categories.map((c) => ({ slug: c.slug }));
+}
 
 export async function generateMetadata({
   params,

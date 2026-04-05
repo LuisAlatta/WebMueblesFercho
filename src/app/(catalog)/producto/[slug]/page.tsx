@@ -4,7 +4,7 @@ import { Metadata } from "next";
 import ProductDetail from "@/components/catalog/ProductDetail";
 import { getSiteUrl } from "@/lib/siteUrl";
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;

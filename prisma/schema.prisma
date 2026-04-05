@@ -20,6 +20,8 @@ model Category {
   createdAt     DateTime     @default(now())
   products      Product[]
   sets          ProductSet[]
+
+  @@index([isActive, order])
 }
 
 model Product {
@@ -40,6 +42,9 @@ model Product {
   viewCount      Int              @default(0)
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
+
+  @@index([categoryId, isActive, order])
+  @@index([isActive, isFeatured, order])
 }
 
 model ProductImage {
@@ -81,6 +86,7 @@ model Variant {
   priceHistory  PriceHistory[]
 
   @@unique([productId, materialId, measurementId])
+  @@index([productId, isActive])
 }
 
 model PriceHistory {

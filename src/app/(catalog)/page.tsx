@@ -3,7 +3,7 @@ import Image from "next/image";
 import { prisma } from "@/lib/prisma";
 import HomeSearch from "@/components/catalog/HomeSearch";
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 const categoryImages: Record<string, string> = {
   dormitorio: "/images/cat-dormitorios.png",
