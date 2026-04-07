@@ -1,9 +1,9 @@
 import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 import ProductCard from "@/components/catalog/ProductCard";
+import Breadcrumbs from "@/components/catalog/Breadcrumbs";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
 import { Metadata } from "next";
 
 export const revalidate = 3600;
@@ -61,17 +61,12 @@ export default async function CategoriaPage({
   return (
     <div className="min-h-[calc(100dvh-72px)]">
       {/* Header */}
-      <div className="sticky top-[72px] z-40 bg-white border-b border-gray-100 px-4 py-3 md:bg-white/95 md:backdrop-blur-md">
+      <div className="sticky top-[72px] z-40 bg-white dark:bg-[#1C1C1E] border-b border-gray-100 dark:border-white/10 px-4 py-3 md:bg-white/95 md:backdrop-blur-md">
+        <Breadcrumbs items={[{ label: category.name }]} />
         <div className="flex items-center gap-3">
-          <Link
-            href="/"
-            className="flex items-center justify-center w-8 h-8 rounded-full bg-[#f5f3f0] hover:bg-[#ebe7e2] transition-colors shrink-0"
-          >
-            <ArrowLeft className="w-4 h-4 text-[#1C1C1E]" />
-          </Link>
           <div className="min-w-0">
             <h1
-              className="text-base font-bold text-[#1C1C1E] truncate"
+              className="text-base font-bold text-[#1C1C1E] dark:text-white truncate"
               style={{ fontFamily: "var(--font-playfair)" }}
             >
               {category.name}

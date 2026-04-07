@@ -66,6 +66,7 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://bruxqwwypotsdghsxowo.supabase.co" />
         <link rel="dns-prefetch" href="https://bruxqwwypotsdghsxowo.supabase.co" />
+        <script dangerouslySetInnerHTML={{ __html: `try{if(localStorage.getItem('mf-theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}` }} />
       </head>
       <body className="min-h-full flex flex-col bg-background text-foreground font-[var(--font-sans)]">
         <GoogleAnalytics />

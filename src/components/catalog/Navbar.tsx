@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { Menu, X, Search } from "lucide-react";
 import dynamic from "next/dynamic";
 import { cn } from "@/lib/utils";
+import DarkModeToggle from "./DarkModeToggle";
 
 const SearchBar = dynamic(() => import("./SearchBar"), { ssr: false });
 
@@ -32,7 +33,6 @@ export default function Navbar({ businessName }: { businessName: string }) {
 
   useEffect(() => { setMenuOpen(false); setSearchOpen(false); }, [pathname]);
 
-  // Close search on outside click
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
@@ -46,27 +46,21 @@ export default function Navbar({ businessName }: { businessName: string }) {
   return (
     <header
       className={cn(
-        "sticky top-0 z-50 transition-shadow duration-300",
-        scrolled ? "shadow-lg" : ""
+        "sticky top-0 z-50 bg-[#1C1C1E] transition-shadow duration-300",
+        scrolled ? "shadow-lg shadow-black/20" : ""
       )}
-      style={{
-        backgroundImage: "url('/images/wood-header-bg.png')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-      }}
     >
       <div className="max-w-7xl mx-auto px-6 h-[72px] flex items-center justify-between gap-8">
 
         {/* Logo */}
         <Link href="/" className="shrink-0">
           <span
-            className="block text-xl font-bold text-white leading-tight drop-shadow-sm"
+            className="block text-xl font-bold text-white leading-tight"
             style={{ fontFamily: "var(--font-playfair)" }}
           >
             {businessName}
           </span>
-          <span className="block text-[10px] text-white/70 uppercase tracking-[0.2em] font-medium">
+          <span className="block text-[10px] text-[#C9A96E] uppercase tracking-[0.2em] font-medium">
             Fabricación a medida
           </span>
         </Link>
@@ -80,12 +74,11 @@ export default function Navbar({ businessName }: { businessName: string }) {
                 key={l.href}
                 href={l.href}
                 className={cn(
-                  "relative px-4 py-2 text-sm transition-colors duration-200 group drop-shadow-sm",
-                  isActive ? "text-white font-medium" : "text-white/75 hover:text-white"
+                  "relative px-4 py-2 text-sm transition-colors duration-200 group",
+                  isActive ? "text-white font-medium" : "text-white/60 hover:text-white"
                 )}
               >
                 {l.label}
-                {/* Underline */}
                 <span
                   className={cn(
                     "absolute bottom-0 left-4 right-4 h-0.5 bg-[#C9A96E] transition-transform duration-300 origin-left",
@@ -98,13 +91,14 @@ export default function Navbar({ businessName }: { businessName: string }) {
         </nav>
 
         {/* Actions */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
+          <DarkModeToggle />
           {/* Search */}
           <div className="relative" ref={searchRef}>
             <button
               onClick={() => setSearchOpen(!searchOpen)}
               aria-label="Buscar"
-              className="p-2 text-white/75 hover:text-white transition-colors drop-shadow-sm"
+              className="p-2 text-white/75 hover:text-white transition-colors"
             >
               <Search className="w-5 h-5" />
             </button>
@@ -119,7 +113,7 @@ export default function Navbar({ businessName }: { businessName: string }) {
           <button
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label="Menú"
-            className="md:hidden p-2 text-white/75 hover:text-white transition-colors drop-shadow-sm"
+            className="md:hidden p-2 text-white/75 hover:text-white transition-colors"
           >
             {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
@@ -128,7 +122,7 @@ export default function Navbar({ businessName }: { businessName: string }) {
 
       {/* Mobile menu */}
       {menuOpen && (
-        <nav className="md:hidden border-t border-gray-100 bg-white px-6 py-4 space-y-1 shadow-lg">
+        <nav className="md:hidden border-t border-white/10 bg-[#1C1C1E] px-6 py-4 space-y-1 shadow-lg">
           {navLinks.map((l) => {
             const isActive = l.href === "/" ? pathname === "/" : pathname.startsWith(l.href);
             return (
@@ -136,10 +130,10 @@ export default function Navbar({ businessName }: { businessName: string }) {
                 key={l.href}
                 href={l.href}
                 className={cn(
-                  "flex items-center py-3 text-sm border-b border-gray-50 transition-colors",
+                  "flex items-center py-3 text-sm border-b border-white/5 transition-colors",
                   isActive
-                    ? "text-[#1C1C1E] font-semibold"
-                    : "text-[#777] hover:text-[#1C1C1E]"
+                    ? "text-white font-semibold"
+                    : "text-white/60 hover:text-white"
                 )}
               >
                 {isActive && <span className="w-1 h-4 bg-[#C9A96E] mr-3 rounded-full" />}
@@ -150,7 +144,7 @@ export default function Navbar({ businessName }: { businessName: string }) {
           <div className="pt-3">
             <Link
               href="/contacto"
-              className="block text-center bg-[#1C1C1E] text-white text-xs uppercase tracking-widest py-3 hover:bg-[#333] transition-colors"
+              className="block text-center bg-[#C9A96E] text-[#1C1C1E] text-xs uppercase tracking-widest py-3 rounded-xl font-semibold hover:bg-[#b8965e] transition-colors"
             >
               Pedir cotización
             </Link>

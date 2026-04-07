@@ -76,6 +76,24 @@ export default function HomeSearch() {
         />
       </div>
 
+      {/* Suggestions when focused but no query */}
+      {focused && query.length < 2 && (
+        <div className="absolute left-0 right-0 top-full mt-1 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50 py-3 px-4">
+          <p className="text-[10px] text-[#999] uppercase tracking-wider font-medium mb-2">Sugerencias</p>
+          <div className="flex flex-wrap gap-2">
+            {["Mesa", "Ropero", "Cama", "Escritorio", "Biblioteca", "Rack"].map((s) => (
+              <button
+                key={s}
+                onClick={() => { setQuery(s); }}
+                className="text-xs bg-[#f5f3f0] hover:bg-[#ebe7e2] text-[#1C1C1E] px-3 py-1.5 rounded-full transition-colors"
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {showResults && (
         <div className="absolute left-0 right-0 top-full mt-1 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50">
           {results.length > 0 ? (

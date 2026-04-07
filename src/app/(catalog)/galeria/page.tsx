@@ -25,10 +25,13 @@ export default async function GaleriaPage() {
   });
 
   const photos = shuffle(productImages);
+  // Pick a few "featured" images to make bigger
+  const featuredIds = new Set(photos.slice(0, 3).map((p) => p.id));
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16">
-      <div className="text-center mb-12">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
+      <div className="text-center mb-10">
+        <p className="text-[10px] text-[#C9A96E] uppercase tracking-[0.3em] font-semibold mb-2">Nuestro trabajo</p>
         <h1
           className="text-3xl md:text-4xl font-bold text-[#1C1C1E]"
           style={{ fontFamily: "var(--font-playfair)" }}
@@ -46,16 +49,17 @@ export default async function GaleriaPage() {
             <Link
               key={photo.id}
               href={`/producto/${photo.product.slug}`}
-              className="break-inside-avoid rounded-xl overflow-hidden bg-gray-100 group relative block"
+              className="break-inside-avoid rounded-xl overflow-hidden bg-[#f0ece6] group relative block"
             >
               <Image
                 src={photo.url}
                 alt={photo.altText ?? photo.product.name}
-                width={400}
-                height={500}
-                className="w-full h-auto object-cover"
+                width={featuredIds.has(photo.id) ? 600 : 400}
+                height={featuredIds.has(photo.id) ? 750 : 500}
+                className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
               />
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3 opacity-0 group-hover:opacity-100 transition-opacity">
+              {/* Always visible on mobile, hover on desktop */}
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
                 <p className="text-white text-sm font-medium line-clamp-1">{photo.product.name}</p>
                 <p className="text-white/60 text-xs">{photo.product.category.name}</p>
               </div>

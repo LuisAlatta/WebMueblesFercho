@@ -1,12 +1,15 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import { buildWhatsAppUrl } from "@/lib/whatsapp";
 import { formatPrice } from "@/lib/utils";
-import { MessageCircle, Shield, Clock, ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
+import { MessageCircle, Shield, Clock, ChevronLeft, ChevronRight } from "lucide-react";
+import Breadcrumbs from "./Breadcrumbs";
+import ShareButton from "./ShareButton";
+import RecentlyViewed, { trackProductView } from "./RecentlyViewed";
 
 const Lightbox = dynamic(() => import("./Lightbox"), { ssr: false });
 
@@ -31,6 +34,16 @@ export default function ProductDetail({ product }: { product: Product }) {
   const [lightbox, setLightbox] = useState(false);
   const [selectedMaterial, setSelectedMaterial] = useState<number | null>(null);
   const [selectedMeasurement, setSelectedMeasurement] = useState<number | null>(null);
+
+  // Track recently viewed
+  useEffect(() => {
+    trackProductView({
+      slug: product.slug,
+      name: product.name,
+      image: product.images[0]?.url ?? "",
+      category: product.category.name,
+    });
+  }, [product.slug, product.name, product.images, product.category.name]);
 
   // Materiales únicos disponibles
   const materials = Array.from(
@@ -104,9 +117,10 @@ export default function ProductDetail({ product }: { product: Product }) {
     {/* Espacio para que el contenido no quede detrás del sticky bar en mobile */}
     <div className="h-20 md:hidden" />
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
-      <Link href={`/categoria/${product.category.slug}`} className="inline-flex items-center gap-1.5 text-sm text-[#7A7A7A] hover:text-[#1C1C1E] mb-6 transition-colors">
-        <ArrowLeft className="w-4 h-4" /> {product.category.name}
-      </Link>
+      <Breadcrumbs items={[
+        { label: product.category.name, href: `/categoria/${product.category.slug}` },
+        { label: product.name },
+      ]} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-16">
         {/* Galería */}
@@ -175,18 +189,23 @@ export default function ProductDetail({ product }: { product: Product }) {
 
         {/* Info del producto */}
         <div>
-          <p className="text-sm text-[#8B7355] font-medium mb-2">{product.category.name}</p>
-          <h1
-            className="text-2xl md:text-3xl font-bold text-[#1C1C1E] mb-4 leading-tight"
-            style={{ fontFamily: "var(--font-playfair)" }}
-          >
-            {product.name}
-          </h1>
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-xs text-[#C9A96E] font-semibold uppercase tracking-widest mb-1.5">{product.category.name}</p>
+              <h1
+                className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#1C1C1E] mb-3 leading-tight"
+                style={{ fontFamily: "var(--font-playfair)" }}
+              >
+                {product.name}
+              </h1>
+            </div>
+            <ShareButton title={product.name} text={`Mirá este mueble: ${product.name}`} />
+          </div>
 
           {/* Precio */}
           <div className="mb-6">
             {price !== null ? (
-              <p className="text-3xl font-bold text-[#1C1C1E]">{formatPrice(price)}</p>
+              <p className="text-3xl sm:text-4xl font-bold text-[#C9A96E]">{formatPrice(price)}</p>
             ) : (
               <p className="text-lg text-[#7A7A7A]">Consultá el precio por WhatsApp</p>
             )}
@@ -203,7 +222,7 @@ export default function ProductDetail({ product }: { product: Product }) {
                   <button
                     key={m.id}
                     onClick={() => { setSelectedMaterial(selectedMaterial === m.id ? null : m.id); setSelectedMeasurement(null); }}
-                    className={`px-4 py-2 rounded-lg text-sm border transition-all ${selectedMaterial === m.id ? "bg-[#1C1C1E] text-white border-[#1C1C1E]" : "border-gray-200 text-[#2C2C2C] hover:border-[#8B7355]"}`}
+                    className={`px-4 py-2.5 rounded-full text-sm border transition-all ${selectedMaterial === m.id ? "bg-[#1C1C1E] text-white border-[#1C1C1E] shadow-sm" : "border-gray-200 text-[#2C2C2C] hover:border-[#8B7355] hover:bg-[#FAF9F7]"}`}
                   >
                     {m.name}
                   </button>
@@ -223,7 +242,7 @@ export default function ProductDetail({ product }: { product: Product }) {
                   <button
                     key={m.id}
                     onClick={() => setSelectedMeasurement(selectedMeasurement === m.id ? null : m.id)}
-                    className={`px-4 py-2 rounded-lg text-sm border transition-all ${selectedMeasurement === m.id ? "bg-[#1C1C1E] text-white border-[#1C1C1E]" : "border-gray-200 text-[#2C2C2C] hover:border-[#8B7355]"}`}
+                    className={`px-4 py-2.5 rounded-full text-sm border transition-all ${selectedMeasurement === m.id ? "bg-[#1C1C1E] text-white border-[#1C1C1E] shadow-sm" : "border-gray-200 text-[#2C2C2C] hover:border-[#8B7355] hover:bg-[#FAF9F7]"}`}
                   >
                     {m.label}
                   </button>
@@ -267,6 +286,9 @@ export default function ProductDetail({ product }: { product: Product }) {
           )}
         </div>
       </div>
+
+      {/* Recently Viewed */}
+      <RecentlyViewed excludeSlug={product.slug} />
 
       {/* Lightbox — cargado dinámicamente */}
       {lightbox && (

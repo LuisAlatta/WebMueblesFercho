@@ -2,6 +2,7 @@ import dynamic from "next/dynamic";
 import { prisma } from "@/lib/prisma";
 import ProductGrid from "@/components/catalog/ProductGrid";
 import FilterSidebar from "@/components/catalog/FilterSidebar";
+import ActiveFilters from "@/components/catalog/ActiveFilters";
 import OrdenSelect from "@/components/catalog/OrdenSelect";
 import { toSearchQuery } from "@/lib/utils";
 import { Metadata } from "next";
@@ -113,6 +114,12 @@ export default async function CatalogoPage({ searchParams }: Props) {
               <OrdenSelect current={filters.orden} />
             </div>
           </div>
+
+          {/* Active filter chips */}
+          <ActiveFilters
+            filters={filters}
+            categoryName={categories.find((c) => c.slug === filters.categoria)?.name}
+          />
 
           {/* Grid de productos */}
           {products.length > 0 ? (
