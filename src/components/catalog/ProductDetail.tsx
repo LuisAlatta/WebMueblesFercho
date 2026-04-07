@@ -114,9 +114,7 @@ export default function ProductDetail({ product }: { product: Product }) {
         Consultar por WhatsApp
       </a>
     </div>
-    {/* Espacio para que el contenido no quede detrás del sticky bar en mobile */}
-    <div className="h-20 md:hidden" />
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-4 pb-6 sm:py-10">
       <Breadcrumbs items={[
         { label: product.category.name, href: `/categoria/${product.category.slug}` },
         { label: product.name },
@@ -302,6 +300,8 @@ export default function ProductDetail({ product }: { product: Product }) {
         />
       )}
     </div>
+    {/* Espacio para que el contenido no quede detrás del sticky WhatsApp en mobile */}
+    <div className="h-20 md:hidden" />
     </>
   );
 }
