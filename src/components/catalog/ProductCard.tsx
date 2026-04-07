@@ -67,11 +67,11 @@ export default function ProductCard({
       </div>
 
       {/* Info debajo */}
-      <div className="px-3 py-3 bg-white dark:bg-[#2C2C2C] border-b border-gray-100 dark:border-white/5">
+      <div className="px-3 py-3 bg-white border-b border-gray-100">
         <p className="text-[10px] text-[#C9A96E] font-semibold uppercase tracking-widest mb-0.5 truncate">
           {category.name}
         </p>
-        <h3 className="text-[#1C1C1E] dark:text-white text-xs sm:text-sm font-medium leading-snug line-clamp-2 group-hover:text-[#8B7355] transition-colors mb-1.5">
+        <h3 className="text-[#1C1C1E] text-xs sm:text-sm font-medium leading-snug line-clamp-2 group-hover:text-[#8B7355] transition-colors mb-1.5">
           {name}
         </h3>
         {minPrice !== null ? (

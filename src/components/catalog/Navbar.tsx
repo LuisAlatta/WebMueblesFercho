@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 import { Menu, X, Search } from "lucide-react";
 import dynamic from "next/dynamic";
 import { cn } from "@/lib/utils";
-import DarkModeToggle from "./DarkModeToggle";
 
 const SearchBar = dynamic(() => import("./SearchBar"), { ssr: false });
 
@@ -92,7 +91,6 @@ export default function Navbar({ businessName }: { businessName: string }) {
 
         {/* Actions */}
         <div className="flex items-center gap-1">
-          <DarkModeToggle />
           {/* Search */}
           <div className="relative" ref={searchRef}>
             <button

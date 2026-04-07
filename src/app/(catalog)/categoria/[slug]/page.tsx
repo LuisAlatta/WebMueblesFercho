@@ -61,12 +61,12 @@ export default async function CategoriaPage({
   return (
     <div className="min-h-[calc(100dvh-72px)]">
       {/* Header */}
-      <div className="sticky top-[72px] z-40 bg-white dark:bg-[#1C1C1E] border-b border-gray-100 dark:border-white/10 px-4 py-3 md:bg-white/95 md:backdrop-blur-md">
+      <div className="sticky top-[72px] z-40 bg-white border-b border-gray-100 px-4 py-3 md:bg-white/95 md:backdrop-blur-md">
         <Breadcrumbs items={[{ label: category.name }]} />
         <div className="flex items-center gap-3">
           <div className="min-w-0">
             <h1
-              className="text-base font-bold text-[#1C1C1E] dark:text-white truncate"
+              className="text-base font-bold text-[#1C1C1E] truncate"
               style={{ fontFamily: "var(--font-playfair)" }}
             >
               {category.name}
