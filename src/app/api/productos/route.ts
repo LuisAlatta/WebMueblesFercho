@@ -18,9 +18,12 @@ export async function GET(req: NextRequest) {
   const [products, total] = await Promise.all([
     prisma.product.findMany({
       where,
-      include: {
+      select: {
+        id: true,
+        name: true,
+        slug: true,
         category: { select: { id: true, name: true, slug: true } },
-        images: { orderBy: { order: "asc" }, take: 1 },
+        images: { orderBy: { order: "asc" }, take: 1, select: { url: true } },
         _count: { select: { variants: true } },
       },
       orderBy: [{ order: "asc" }, { createdAt: "desc" }],
@@ -30,7 +33,10 @@ export async function GET(req: NextRequest) {
     prisma.product.count({ where }),
   ]);
 
-  return NextResponse.json({ products, total, page, pages: Math.ceil(total / limit) });
+  return NextResponse.json(
+    { products, total, page, pages: Math.ceil(total / limit) },
+    { headers: { "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60" } }
+  );
 }
 
 export async function POST(req: NextRequest) {

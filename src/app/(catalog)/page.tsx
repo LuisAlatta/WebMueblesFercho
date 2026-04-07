@@ -38,7 +38,7 @@ export default async function HomePage() {
   return (
     <div className="flex flex-col min-h-[calc(100dvh-72px)]">
       {/* Search bar - sticky below navbar */}
-      <div className="sticky top-[72px] z-40 bg-white/95 backdrop-blur-md border-b border-gray-100 px-4 py-3">
+      <div className="sticky top-[72px] z-40 bg-white border-b border-gray-100 px-4 py-3 md:bg-white/95 md:backdrop-blur-md">
         <HomeSearch />
       </div>
 
@@ -63,20 +63,21 @@ export default async function HomePage() {
 
         {/* Category grid */}
         <div className="grid grid-cols-2 gap-3">
-          {categories.map((cat) => {
+          {categories.map((cat, index) => {
             const img = cat.imageUrl || getCategoryImage(cat.name);
 
             return (
               <Link
                 key={cat.id}
                 href={`/categoria/${cat.slug}`}
-                className="group relative aspect-[4/5] rounded-2xl overflow-hidden"
+                className="group relative aspect-[4/5] rounded-2xl overflow-hidden active:scale-[0.97] transition-transform duration-150"
               >
                 {img ? (
                   <Image
                     src={img}
                     alt={cat.name}
                     fill
+                    priority={index < 4}
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
                     sizes="(max-width: 640px) 50vw, 25vw"
                   />

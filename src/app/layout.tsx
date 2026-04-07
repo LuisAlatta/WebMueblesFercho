@@ -60,6 +60,10 @@ export default function RootLayout({
       className={`${spaceGrotesk.variable} ${playfair.variable} h-full antialiased`}
       suppressHydrationWarning
     >
+      <head>
+        <link rel="preconnect" href="https://bruxqwwypotsdghsxowo.supabase.co" />
+        <link rel="dns-prefetch" href="https://bruxqwwypotsdghsxowo.supabase.co" />
+      </head>
       <body className="min-h-full flex flex-col bg-background text-foreground font-[var(--font-sans)]">
         <GoogleAnalytics />
         {children}

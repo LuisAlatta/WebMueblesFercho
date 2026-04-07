@@ -1,9 +1,11 @@
+import dynamic from "next/dynamic";
 import { prisma } from "@/lib/prisma";
-import ProductCard from "@/components/catalog/ProductCard";
+import ProductGrid from "@/components/catalog/ProductGrid";
 import FilterSidebar from "@/components/catalog/FilterSidebar";
-import MobileFilterDrawer from "@/components/catalog/MobileFilterDrawer";
 import OrdenSelect from "@/components/catalog/OrdenSelect";
 import { Metadata } from "next";
+
+const MobileFilterDrawer = dynamic(() => import("@/components/catalog/MobileFilterDrawer"));
 
 export const metadata: Metadata = { title: "Catálogo" };
 export const revalidate = 60;
@@ -16,6 +18,7 @@ async function getProducts(filters: Awaited<Props["searchParams"]>) {
   const where: Record<string, unknown> = { isActive: true };
   if (filters.categoria) where.category = { slug: filters.categoria };
   if (filters.search) where.name = { contains: filters.search, mode: "insensitive" };
+  if (filters.material) where.variants = { some: { isActive: true, material: { name: filters.material } } };
 
   const byPrice = filters.orden === "precio_asc" || filters.orden === "precio_desc";
   const orderBy = byPrice
@@ -27,9 +30,13 @@ async function getProducts(filters: Awaited<Props["searchParams"]>) {
   const raw = await prisma.product.findMany({
     where,
     ...(orderBy ? { orderBy } : {}),
-    include: {
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      isFeatured: true,
       category: { select: { name: true, slug: true } },
-      images: { orderBy: { order: "asc" }, take: 1 },
+      images: { orderBy: { order: "asc" }, take: 1, select: { url: true, altText: true } },
       variants: { where: { isActive: true }, select: { price: true }, orderBy: { price: "asc" } },
     },
   });
@@ -103,11 +110,7 @@ export default async function CatalogoPage({ searchParams }: Props) {
 
           {/* Grid de productos */}
           {products.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
-              {products.map((p) => (
-                <ProductCard key={p.id} {...p} />
-              ))}
-            </div>
+            <ProductGrid products={products} />
           ) : (
             <div className="text-center py-20">
               <p className="text-[#7A7A7A]">No se encontraron productos.</p>

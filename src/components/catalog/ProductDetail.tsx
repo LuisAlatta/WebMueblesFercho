@@ -1,12 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import { buildWhatsAppUrl } from "@/lib/whatsapp";
 import { formatPrice } from "@/lib/utils";
-import ProductCard from "./ProductCard";
-import { MessageCircle, Shield, Clock, ArrowLeft, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { MessageCircle, Shield, Clock, ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
+
+const Lightbox = dynamic(() => import("./Lightbox"), { ssr: false });
+
+const BLUR_DATA_URL =
+  "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNjciIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjY3IiBmaWxsPSIjZjBlY2U2Ii8+PC9zdmc+";
 
 interface Material { id: number; name: string; }
 interface Measurement { id: number; label: string; }
@@ -21,14 +26,7 @@ interface Product {
   variants: Variant[];
 }
 
-interface RelatedProduct {
-  id: number; name: string; slug: string;
-  category: { name: string; slug: string };
-  images: { url: string; altText?: string | null }[];
-  variants: { price: number | string }[];
-}
-
-export default function ProductDetail({ product, related }: { product: Product; related: RelatedProduct[] }) {
+export default function ProductDetail({ product }: { product: Product }) {
   const [selectedImage, setSelectedImage] = useState(0);
   const [lightbox, setLightbox] = useState(false);
   const [selectedMaterial, setSelectedMaterial] = useState<number | null>(null);
@@ -110,6 +108,8 @@ export default function ProductDetail({ product, related }: { product: Product; 
                 fill className="object-cover"
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 priority
+                placeholder="blur"
+                blurDataURL={BLUR_DATA_URL}
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-gray-300">
@@ -241,49 +241,16 @@ export default function ProductDetail({ product, related }: { product: Product; 
         </div>
       </div>
 
-      {/* Productos relacionados */}
-      {related.length > 0 && (
-        <section>
-          <h2
-            className="text-xl font-bold text-[#1C1C1E] mb-6"
-            style={{ fontFamily: "var(--font-playfair)" }}
-          >
-            También te puede interesar
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {related.map((p) => <ProductCard key={p.id} {...p} />)}
-          </div>
-        </section>
-      )}
-
-      {/* Lightbox */}
-      {lightbox && product.images[selectedImage] && (
-        <div
-          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
-          onClick={() => setLightbox(false)}
-        >
-          <button className="absolute top-4 right-4 text-white/70 hover:text-white">
-            <X className="w-7 h-7" />
-          </button>
-          <div className="relative max-w-4xl max-h-[90vh] w-full h-full">
-            <Image
-              src={product.images[selectedImage].url}
-              alt={product.images[selectedImage].altText ?? product.name}
-              fill className="object-contain"
-              onClick={(e) => e.stopPropagation()}
-            />
-          </div>
-          {product.images.length > 1 && (
-            <>
-              <button onClick={(e) => { e.stopPropagation(); prevImage(); }} className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white">
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-              <button onClick={(e) => { e.stopPropagation(); nextImage(); }} className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white">
-                <ChevronRight className="w-5 h-5" />
-              </button>
-            </>
-          )}
-        </div>
+      {/* Lightbox — cargado dinámicamente */}
+      {lightbox && (
+        <Lightbox
+          images={product.images}
+          selectedIndex={selectedImage}
+          onClose={() => setLightbox(false)}
+          onPrev={prevImage}
+          onNext={nextImage}
+          productName={product.name}
+        />
       )}
     </div>
     </>

@@ -2,6 +2,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { formatPrice } from "@/lib/utils";
 
+const BLUR_DATA_URL =
+  "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNjciIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjY3IiBmaWxsPSIjZjBlY2U2Ii8+PC9zdmc+";
+
 interface ProductCardProps {
   id: number;
   name: string;
@@ -22,7 +25,7 @@ export default function ProductCard({
   const samePrice = minPrice === maxPrice;
 
   return (
-    <Link href={`/producto/${slug}`} className="group block overflow-hidden bg-[#f0ece6]">
+    <Link href={`/producto/${slug}`} className="group block overflow-hidden bg-[#f0ece6] active:scale-[0.97] transition-transform duration-150">
       {/* Imagen */}
       <div className="relative aspect-[3/5] overflow-hidden">
         {img ? (
@@ -30,6 +33,8 @@ export default function ProductCard({
             src={img.url}
             alt={img.altText ?? name}
             fill
+            placeholder="blur"
+            blurDataURL={BLUR_DATA_URL}
             className="object-cover transition-transform duration-700 group-hover:scale-110"
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           />

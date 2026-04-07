@@ -4,8 +4,10 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X, Search } from "lucide-react";
+import dynamic from "next/dynamic";
 import { cn } from "@/lib/utils";
-import SearchBar from "./SearchBar";
+
+const SearchBar = dynamic(() => import("./SearchBar"), { ssr: false });
 
 const navLinks = [
   { href: "/", label: "Inicio" },
@@ -24,7 +26,7 @@ export default function Navbar({ businessName }: { businessName: string }) {
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 30);
-    window.addEventListener("scroll", onScroll);
+    window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 

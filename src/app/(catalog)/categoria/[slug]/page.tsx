@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 import ProductCard from "@/components/catalog/ProductCard";
 import { notFound } from "next/navigation";
@@ -6,6 +7,10 @@ import { ArrowLeft } from "lucide-react";
 import { Metadata } from "next";
 
 export const revalidate = 3600;
+
+const getCategory = cache((slug: string) =>
+  prisma.category.findUnique({ where: { slug, isActive: true } })
+);
 
 export async function generateStaticParams() {
   const categories = await prisma.category.findMany({
@@ -21,7 +26,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const cat = await prisma.category.findUnique({ where: { slug } });
+  const cat = await getCategory(slug);
   return { title: cat?.name ?? "Categoria" };
 }
 
@@ -32,22 +37,20 @@ export default async function CategoriaPage({
 }) {
   const { slug } = await params;
 
-  const category = await prisma.category.findUnique({
-    where: { slug, isActive: true },
-  });
+  const category = await getCategory(slug);
   if (!category) notFound();
 
   const raw = await prisma.product.findMany({
     where: { categoryId: category.id, isActive: true },
     orderBy: [{ isFeatured: "desc" }, { order: "asc" }],
-    include: {
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      isFeatured: true,
       category: { select: { name: true, slug: true } },
-      images: { orderBy: { order: "asc" }, take: 1 },
-      variants: {
-        where: { isActive: true },
-        select: { price: true },
-        orderBy: { price: "asc" },
-      },
+      images: { orderBy: { order: "asc" }, take: 1, select: { url: true, altText: true } },
+      variants: { where: { isActive: true }, select: { price: true }, orderBy: { price: "asc" } },
     },
   });
   const products = raw.map((p) => ({
@@ -58,7 +61,7 @@ export default async function CategoriaPage({
   return (
     <div className="min-h-[calc(100dvh-72px)]">
       {/* Header */}
-      <div className="sticky top-[72px] z-40 bg-white/95 backdrop-blur-md border-b border-gray-100 px-4 py-3">
+      <div className="sticky top-[72px] z-40 bg-white border-b border-gray-100 px-4 py-3 md:bg-white/95 md:backdrop-blur-md">
         <div className="flex items-center gap-3">
           <Link
             href="/"
