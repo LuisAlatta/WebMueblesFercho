@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
@@ -73,6 +73,21 @@ export default function ProductDetail({ product }: { product: Product }) {
     setSelectedImage((i) => (i < product.images.length - 1 ? i + 1 : 0));
   }
 
+  // Swipe handling
+  const touchStartX = useRef(0);
+  const touchDeltaX = useRef(0);
+  const onTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchDeltaX.current = 0;
+  }, []);
+  const onTouchMove = useCallback((e: React.TouchEvent) => {
+    touchDeltaX.current = e.touches[0].clientX - touchStartX.current;
+  }, []);
+  const onTouchEnd = useCallback(() => {
+    if (touchDeltaX.current > 50) prevImage();
+    else if (touchDeltaX.current < -50) nextImage();
+  }, []);
+
   return (
     <>
     {/* Barra sticky WhatsApp — solo mobile */}
@@ -98,8 +113,11 @@ export default function ProductDetail({ product }: { product: Product }) {
         <div>
           {/* Imagen principal */}
           <div
-            className="relative aspect-[3/5] bg-gray-50 rounded-2xl overflow-hidden cursor-zoom-in mb-3"
+            className="relative aspect-[3/5] bg-gray-50 rounded-2xl overflow-hidden cursor-zoom-in mb-3 touch-pan-y"
             onClick={() => setLightbox(true)}
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={onTouchEnd}
           >
             {product.images[selectedImage] ? (
               <Image
@@ -120,12 +138,21 @@ export default function ProductDetail({ product }: { product: Product }) {
             )}
             {product.images.length > 1 && (
               <>
-                <button onClick={(e) => { e.stopPropagation(); prevImage(); }} className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/90 rounded-full flex items-center justify-center shadow hover:bg-white transition-colors">
+                <button onClick={(e) => { e.stopPropagation(); prevImage(); }} className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/90 rounded-full flex items-center justify-center shadow hover:bg-white transition-colors hidden md:flex">
                   <ChevronLeft className="w-4 h-4 text-[#1C1C1E]" />
                 </button>
-                <button onClick={(e) => { e.stopPropagation(); nextImage(); }} className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/90 rounded-full flex items-center justify-center shadow hover:bg-white transition-colors">
+                <button onClick={(e) => { e.stopPropagation(); nextImage(); }} className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/90 rounded-full flex items-center justify-center shadow hover:bg-white transition-colors hidden md:flex">
                   <ChevronRight className="w-4 h-4 text-[#1C1C1E]" />
                 </button>
+                {/* Dots indicator for mobile */}
+                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 md:hidden">
+                  {product.images.map((_, i) => (
+                    <span
+                      key={i}
+                      className={`w-1.5 h-1.5 rounded-full transition-colors ${i === selectedImage ? "bg-white" : "bg-white/40"}`}
+                    />
+                  ))}
+                </div>
               </>
             )}
           </div>

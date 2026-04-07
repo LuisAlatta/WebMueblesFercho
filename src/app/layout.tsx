@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Space_Grotesk, Playfair_Display } from "next/font/google";
 import "./globals.css";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import GoogleAnalytics from "@/components/catalog/GoogleAnalytics";
 import { getSiteUrl } from "@/lib/siteUrl";
 
@@ -8,12 +9,14 @@ const spaceGrotesk = Space_Grotesk({
   variable: "--font-sans",
   subsets: ["latin"],
   display: "swap",
+  weight: ["400", "500", "600", "700"],
 });
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
   subsets: ["latin"],
   display: "swap",
+  weight: ["700"],
 });
 
 export const viewport: Viewport = {
@@ -66,6 +69,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col bg-background text-foreground font-[var(--font-sans)]">
         <GoogleAnalytics />
+        <SpeedInsights />
         {children}
       </body>
     </html>

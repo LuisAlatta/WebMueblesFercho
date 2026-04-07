@@ -30,3 +30,12 @@ export function truncate(text: string, maxLength: number): string {
   if (text.length <= maxLength) return text;
   return text.slice(0, maxLength).trimEnd() + "…";
 }
+
+/** Convert user search input to PostgreSQL tsquery format: "mesa comedor" → "mesa & comedor" */
+export function toSearchQuery(input: string): string {
+  return input
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .join(" & ");
+}

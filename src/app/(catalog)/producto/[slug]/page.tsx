@@ -9,6 +9,14 @@ import { getSiteUrl } from "@/lib/siteUrl";
 
 export const revalidate = 3600;
 
+export async function generateStaticParams() {
+  const products = await prisma.product.findMany({
+    where: { isActive: true },
+    select: { slug: true },
+  });
+  return products.map((p) => ({ slug: p.slug }));
+}
+
 const getProduct = cache((slug: string) =>
   prisma.product.findUnique({
     where: { slug, isActive: true },

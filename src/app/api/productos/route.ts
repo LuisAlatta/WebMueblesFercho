@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { slugify } from "@/lib/utils";
+import { slugify, toSearchQuery } from "@/lib/utils";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -13,7 +13,12 @@ export async function GET(req: NextRequest) {
 
   const where: Record<string, unknown> = {};
   if (categoria) where.category = { slug: categoria };
-  if (search) where.name = { contains: search, mode: "insensitive" };
+  if (search) {
+    const tsquery = toSearchQuery(search);
+    where.name = tsquery
+      ? { search: tsquery }
+      : { contains: search, mode: "insensitive" };
+  }
 
   const [products, total] = await Promise.all([
     prisma.product.findMany({

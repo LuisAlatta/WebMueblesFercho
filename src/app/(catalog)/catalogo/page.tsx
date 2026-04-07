@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import ProductGrid from "@/components/catalog/ProductGrid";
 import FilterSidebar from "@/components/catalog/FilterSidebar";
 import OrdenSelect from "@/components/catalog/OrdenSelect";
+import { toSearchQuery } from "@/lib/utils";
 import { Metadata } from "next";
 
 const MobileFilterDrawer = dynamic(() => import("@/components/catalog/MobileFilterDrawer"));
@@ -17,7 +18,12 @@ interface Props {
 async function getProducts(filters: Awaited<Props["searchParams"]>) {
   const where: Record<string, unknown> = { isActive: true };
   if (filters.categoria) where.category = { slug: filters.categoria };
-  if (filters.search) where.name = { contains: filters.search, mode: "insensitive" };
+  if (filters.search) {
+    const tsquery = toSearchQuery(filters.search);
+    where.name = tsquery
+      ? { search: tsquery }
+      : { contains: filters.search, mode: "insensitive" };
+  }
   if (filters.material) where.variants = { some: { isActive: true, material: { name: filters.material } } };
 
   const byPrice = filters.orden === "precio_asc" || filters.orden === "precio_desc";
