@@ -67,8 +67,8 @@ export default function Navbar({ businessName }: { businessName: string }) {
   return (
     <header
       className={cn(
-        "sticky top-0 z-50 bg-[#1C1C1E] transition-shadow duration-300",
-        scrolled ? "shadow-lg shadow-black/20" : ""
+        "sticky top-0 z-50 bg-black transition-shadow duration-300",
+        scrolled ? "shadow-lg shadow-black/40" : ""
       )}
     >
       <div className="max-w-7xl mx-auto px-6 h-[72px] flex items-center justify-between gap-8">
@@ -78,7 +78,7 @@ export default function Navbar({ businessName }: { businessName: string }) {
           <img
             src="/images/image-removebg-preview.png"
             alt="Muebles Fercho"
-            className="h-12 w-auto object-contain"
+            className="h-12 w-auto object-contain invert brightness-200"
           />
         </Link>
 
@@ -168,7 +168,7 @@ export default function Navbar({ businessName }: { businessName: string }) {
 
       {/* Mobile menu */}
       {menuOpen && (
-        <nav className="md:hidden border-t border-white/10 bg-[#1C1C1E] px-6 py-4 space-y-1 shadow-lg">
+        <nav className="md:hidden border-t border-white/10 bg-black px-6 py-4 space-y-1 shadow-lg">
           {dynamicNavLinks.map((l) => {
             const isActive = l.href === "/" ? pathname === "/" : pathname.startsWith(l.label === "Catalogo" ? "/catalogo" : l.href);
             return (
