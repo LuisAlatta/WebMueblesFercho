@@ -196,7 +196,11 @@ export default function EditProductoPage({ params }: { params: Promise<{ id: str
             <div className="space-y-2">
               <Label>Categoría *</Label>
               <Select value={form.categoryId} onValueChange={(v) => setF("categoryId", v)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccionar categoría">
+                    {form.categoryId ? categories.find(c => String(c.id) === form.categoryId)?.name : "Seleccionar categoría"}
+                  </SelectValue>
+                </SelectTrigger>
                 <SelectContent>
                   {categories.map((c) => (
                     <SelectItem key={c.id} value={String(c.id)}>{c.name}</SelectItem>
@@ -323,7 +327,11 @@ export default function EditProductoPage({ params }: { params: Promise<{ id: str
                   value={newVariant.materialId || "none"}
                   onValueChange={(v) => { const val: string = (v ?? "") === "none" ? "" : (v ?? ""); setNewVariant((p) => ({ ...p, materialId: val })); }}
                 >
-                  <SelectTrigger className="h-9 text-sm"><SelectValue placeholder="Material (opcional)" /></SelectTrigger>
+                  <SelectTrigger className="h-9 text-sm">
+                    <SelectValue placeholder="Material (opcional)">
+                      {newVariant.materialId && newVariant.materialId !== "none" ? materials.find(m => String(m.id) === newVariant.materialId)?.name : "Material (opcional)"}
+                    </SelectValue>
+                  </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">Sin material</SelectItem>
                     {materials.map((m) => <SelectItem key={m.id} value={String(m.id)}>{m.name}</SelectItem>)}
@@ -333,7 +341,11 @@ export default function EditProductoPage({ params }: { params: Promise<{ id: str
                   value={newVariant.measurementId || "none"}
                   onValueChange={(v) => { const val: string = (v ?? "") === "none" ? "" : (v ?? ""); setNewVariant((p) => ({ ...p, measurementId: val })); }}
                 >
-                  <SelectTrigger className="h-9 text-sm"><SelectValue placeholder="Medida (opcional)" /></SelectTrigger>
+                  <SelectTrigger className="h-9 text-sm">
+                    <SelectValue placeholder="Medida (opcional)">
+                      {newVariant.measurementId && newVariant.measurementId !== "none" ? measurements.find(m => String(m.id) === newVariant.measurementId)?.label : "Medida (opcional)"}
+                    </SelectValue>
+                  </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">Sin medida</SelectItem>
                     {measurements.map((m) => <SelectItem key={m.id} value={String(m.id)}>{m.label}</SelectItem>)}

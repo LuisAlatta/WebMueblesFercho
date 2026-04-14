@@ -95,7 +95,9 @@ export default function NuevoProductoPage() {
               <Label>Categoría *</Label>
               <Select value={form.categoryId} onValueChange={(v) => set("categoryId", v)}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Seleccionar categoría" />
+                  <SelectValue placeholder="Seleccionar categoría">
+                    {form.categoryId ? categories.find(c => String(c.id) === form.categoryId)?.name : "Seleccionar categoría"}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {categories.map((c) => (

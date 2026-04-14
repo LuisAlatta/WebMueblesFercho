@@ -162,7 +162,11 @@ export default function EditSetPage() {
             <div className="space-y-2">
               <Label>Categoría (opcional)</Label>
               <Select value={form.categoryId || "none"} onValueChange={(v) => set("categoryId", !v || v === "none" ? "" : v)}>
-                <SelectTrigger><SelectValue placeholder="Sin categoría" /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue placeholder="Sin categoría">
+                    {form.categoryId && form.categoryId !== "none" ? categories.find(c => String(c.id) === form.categoryId)?.name : "Sin categoría"}
+                  </SelectValue>
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">Sin categoría</SelectItem>
                   {categories.map((c) => (
@@ -211,7 +215,9 @@ export default function EditSetPage() {
             <div className="flex gap-2">
               <Select value={addingProductId} onValueChange={(v) => setAddingProductId(v ?? "")}>
                 <SelectTrigger className="flex-1">
-                  <SelectValue placeholder="Seleccionar producto..." />
+                  <SelectValue placeholder="Seleccionar producto...">
+                    {addingProductId ? availableProducts.find(p => String(p.id) === addingProductId)?.name : "Seleccionar producto..."}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {availableProducts.map((p) => (

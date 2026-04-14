@@ -78,7 +78,11 @@ export default function NuevoSetPage() {
             <div className="space-y-2">
               <Label>Categoría (opcional)</Label>
               <Select value={form.categoryId || "none"} onValueChange={(v) => set("categoryId", !v || v === "none" ? "" : v)}>
-                <SelectTrigger><SelectValue placeholder="Sin categoría" /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue placeholder="Sin categoría">
+                    {form.categoryId && form.categoryId !== "none" ? categories.find(c => String(c.id) === form.categoryId)?.name : "Sin categoría"}
+                  </SelectValue>
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">Sin categoría</SelectItem>
                   {categories.map((c) => (
