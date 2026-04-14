@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Menu, X, Search } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { Menu, X, Search, UserCircle } from "lucide-react";
 import dynamic from "next/dynamic";
 import { cn } from "@/lib/utils";
 import { useCatalogType } from "./CatalogTypeProvider";
@@ -19,10 +19,13 @@ const navLinks = [
 
 export default function Navbar({ businessName }: { businessName: string }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [adminModalOpen, setAdminModalOpen] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 30);
@@ -37,6 +40,9 @@ export default function Navbar({ businessName }: { businessName: string }) {
       if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
         setSearchOpen(false);
       }
+      if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
+        setAdminModalOpen(false);
+      }
     };
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
@@ -50,6 +56,13 @@ export default function Navbar({ businessName }: { businessName: string }) {
     }
     return l;
   });
+
+  function handleGoToLogin() {
+    setAdminModalOpen(false);
+    // Pass current path and catalog type as query params so login can redirect back
+    const returnUrl = encodeURIComponent(pathname);
+    router.push(`/login?from=${returnUrl}&tipo=${catalogType}`);
+  }
 
   return (
     <header
@@ -112,6 +125,36 @@ export default function Navbar({ businessName }: { businessName: string }) {
             {searchOpen && (
               <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-200 p-2 z-50">
                 <SearchBar onClose={() => setSearchOpen(false)} />
+              </div>
+            )}
+          </div>
+
+          {/* Admin access button */}
+          <div className="relative" ref={modalRef}>
+            <button
+              onClick={() => setAdminModalOpen(!adminModalOpen)}
+              aria-label="Acceso administrativo"
+              className="p-2 text-white/75 hover:text-white transition-colors"
+            >
+              <UserCircle className="w-5 h-5" />
+            </button>
+
+            {/* Admin modal */}
+            {adminModalOpen && (
+              <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 p-5 z-50">
+                <div className="text-center">
+                  <div className="w-12 h-12 bg-[#1C1C1E] rounded-full flex items-center justify-center mx-auto mb-3">
+                    <UserCircle className="w-7 h-7 text-[#C9A96E]" />
+                  </div>
+                  <p className="text-sm font-semibold text-[#1C1C1E] mb-1">Área restringida</p>
+                  <p className="text-xs text-[#7A7A7A] mb-4">Solo personal administrativo autorizado puede acceder.</p>
+                  <button
+                    onClick={handleGoToLogin}
+                    className="w-full bg-[#1C1C1E] hover:bg-[#2C2C2E] text-white text-sm font-medium py-2.5 rounded-lg transition-colors"
+                  >
+                    Acceder
+                  </button>
+                </div>
               </div>
             )}
           </div>

@@ -1,19 +1,37 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2 } from "lucide-react";
+import { Loader2, ArrowLeft } from "lucide-react";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // Where to go back
+  const fromParam = searchParams.get("from");
+  const tipoParam = searchParams.get("tipo") as "min" | "max" | null;
+  const tipo = tipoParam === "max" ? "max" : "min";
+
+  // Resolve back URL: use `from` if valid catalog/product path, else fallback to catalog
+  function getBackUrl(): string {
+    if (fromParam) {
+      try {
+        const decoded = decodeURIComponent(fromParam);
+        // Only allow internal paths
+        if (decoded.startsWith("/")) return decoded;
+      } catch {}
+    }
+    return `/catalogo/${tipo}`;
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -39,6 +57,15 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#FAF9F7]">
       <div className="w-full max-w-sm">
+        {/* Back button */}
+        <button
+          onClick={() => router.push(getBackUrl())}
+          className="flex items-center gap-1.5 text-sm text-[#7A7A7A] hover:text-[#1C1C1E] transition-colors mb-6"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Volver al catálogo
+        </button>
+
         <div className="text-center mb-8">
           <h1
             className="text-3xl font-bold text-[#1C1C1E]"
@@ -100,5 +127,13 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
   );
 }
