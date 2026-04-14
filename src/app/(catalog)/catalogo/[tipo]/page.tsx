@@ -70,11 +70,13 @@ export default async function CatalogoPage({ params, searchParams }: Props) {
     prisma.material.findMany({ orderBy: { name: "asc" } }),
   ]);
 
-  const title = filters.search
+  const baseTitle = filters.search
     ? `Resultados para "${filters.search}"`
     : filters.categoria
     ? categories.find((c) => c.slug === filters.categoria)?.name ?? "Catálogo"
     : "Catálogo completo";
+
+  const title = tipo === "max" ? `${baseTitle} (Mayorista)` : baseTitle;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-10">

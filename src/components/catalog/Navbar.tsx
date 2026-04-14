@@ -11,7 +11,6 @@ import { useCatalogType } from "./CatalogTypeProvider";
 const SearchBar = dynamic(() => import("./SearchBar"), { ssr: false });
 
 const navLinks = [
-  { href: "/", label: "Inicio" },
   { href: "/catalogo", label: "Catalogo" },
   { href: "/nosotros", label: "Nosotros" },
   { href: "/galeria", label: "Galeria" },
