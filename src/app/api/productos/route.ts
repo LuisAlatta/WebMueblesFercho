@@ -27,6 +27,10 @@ export async function GET(req: NextRequest) {
         id: true,
         name: true,
         slug: true,
+        isActive: true,
+        isFeatured: true,
+        retailPrice: true,
+        wholesalePrice: true,
         category: { select: { id: true, name: true, slug: true } },
         images: { orderBy: { order: "asc" }, take: 1, select: { url: true } },
         _count: { select: { variants: true } },
@@ -51,7 +55,7 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const {
     name, description, categoryId, isFeatured, isActive,
-    warrantyMonths, productionDays, order,
+    warrantyMonths, productionDays, order, retailPrice, wholesalePrice
   } = body;
 
   if (!name || !categoryId) {
@@ -64,6 +68,8 @@ export async function POST(req: NextRequest) {
     data: {
       name, slug, description, categoryId, isFeatured: isFeatured ?? false,
       isActive: isActive ?? true, warrantyMonths, productionDays, order: order ?? 0,
+      retailPrice: retailPrice ? Number(retailPrice) : null,
+      wholesalePrice: wholesalePrice ? Number(wholesalePrice) : null,
     },
   });
   return NextResponse.json(product, { status: 201 });

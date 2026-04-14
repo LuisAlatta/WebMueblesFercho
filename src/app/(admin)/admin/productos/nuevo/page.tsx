@@ -27,6 +27,8 @@ export default function NuevoProductoPage() {
     description: "",
     warrantyMonths: "",
     productionDays: "",
+    retailPrice: "",
+    wholesalePrice: "",
     isFeatured: false,
     isActive: true,
   });
@@ -54,6 +56,8 @@ export default function NuevoProductoPage() {
         categoryId: parseInt(form.categoryId),
         warrantyMonths: form.warrantyMonths ? parseInt(form.warrantyMonths) : null,
         productionDays: form.productionDays ? parseInt(form.productionDays) : null,
+        retailPrice: form.retailPrice ? parseFloat(form.retailPrice) : null,
+        wholesalePrice: form.wholesalePrice ? parseFloat(form.wholesalePrice) : null,
       }),
     });
     setLoading(false);
@@ -109,6 +113,27 @@ export default function NuevoProductoPage() {
                 placeholder="Descripción del producto (opcional)"
                 rows={3}
               />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Precio Minorista (ARS)</Label>
+                <Input
+                  type="number" min="0" step="0.01"
+                  value={form.retailPrice}
+                  onChange={(e) => set("retailPrice", e.target.value)}
+                  placeholder="Ej: 150000"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Precio Mayorista (ARS)</Label>
+                <Input
+                  type="number" min="0" step="0.01"
+                  value={form.wholesalePrice}
+                  onChange={(e) => set("wholesalePrice", e.target.value)}
+                  placeholder="Ej: 120000"
+                />
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">

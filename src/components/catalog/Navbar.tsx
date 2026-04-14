@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { Menu, X, Search } from "lucide-react";
 import dynamic from "next/dynamic";
 import { cn } from "@/lib/utils";
+import { useCatalogType } from "./CatalogTypeProvider";
 
 const SearchBar = dynamic(() => import("./SearchBar"), { ssr: false });
 
@@ -42,6 +43,15 @@ export default function Navbar({ businessName }: { businessName: string }) {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
+  const { catalogType } = useCatalogType();
+
+  const dynamicNavLinks = navLinks.map(l => {
+    if (l.label === "Catalogo") {
+      return { ...l, href: `/catalogo/${catalogType}` };
+    }
+    return l;
+  });
+
   return (
     <header
       className={cn(
@@ -66,8 +76,8 @@ export default function Navbar({ businessName }: { businessName: string }) {
 
         {/* Nav desktop */}
         <nav className="hidden md:flex items-center gap-0">
-          {navLinks.map((l) => {
-            const isActive = l.href === "/" ? pathname === "/" : pathname.startsWith(l.href);
+          {dynamicNavLinks.map((l) => {
+            const isActive = l.href === "/" ? pathname === "/" : pathname.startsWith(l.label === "Catalogo" ? "/catalogo" : l.href);
             return (
               <Link
                 key={l.href}
@@ -121,8 +131,8 @@ export default function Navbar({ businessName }: { businessName: string }) {
       {/* Mobile menu */}
       {menuOpen && (
         <nav className="md:hidden border-t border-white/10 bg-[#1C1C1E] px-6 py-4 space-y-1 shadow-lg">
-          {navLinks.map((l) => {
-            const isActive = l.href === "/" ? pathname === "/" : pathname.startsWith(l.href);
+          {dynamicNavLinks.map((l) => {
+            const isActive = l.href === "/" ? pathname === "/" : pathname.startsWith(l.label === "Catalogo" ? "/catalogo" : l.href);
             return (
               <Link
                 key={l.href}

@@ -6,6 +6,8 @@ import { Metadata } from "next";
 import ProductDetail from "@/components/catalog/ProductDetail";
 import RelatedProducts from "@/components/catalog/RelatedProducts";
 import { getSiteUrl } from "@/lib/siteUrl";
+import CatalogTypeSync from "@/components/catalog/CatalogTypeSync";
+import { CatalogType } from "@/lib/catalogType";
 
 export const revalidate = 3600;
 
@@ -43,8 +45,15 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   };
 }
 
-export default async function ProductoPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function ProductoPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ tipo?: string }>;
+}) {
   const { slug } = await params;
+  const { tipo } = await searchParams;
 
   const product = await getProduct(slug);
 
@@ -58,14 +67,15 @@ export default async function ProductoPage({ params }: { params: Promise<{ slug:
     }).catch(() => {});
   });
 
-  // Serializar Decimal → number en variantes
+  // Serializar Decimal → number
   const productSerialized = {
     ...product,
+    retailPrice: product.retailPrice ? Number(product.retailPrice) : null,
+    wholesalePrice: product.wholesalePrice ? Number(product.wholesalePrice) : null,
     variants: product.variants.map((v) => ({ ...v, price: Number(v.price) })),
   };
 
   const base = getSiteUrl();
-  const minPrice = productSerialized.variants[0]?.price;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -76,15 +86,6 @@ export default async function ProductoPage({ params }: { params: Promise<{ slug:
     url: `${base}/producto/${product.slug}`,
     brand: { "@type": "Brand", name: "Muebles Fercho" },
     category: product.category.name,
-    ...(minPrice !== undefined && {
-      offers: {
-        "@type": "Offer",
-        priceCurrency: "ARS",
-        price: minPrice,
-        availability: "https://schema.org/InStock",
-        seller: { "@type": "Organization", name: "Muebles Fercho" },
-      },
-    }),
   };
 
   return (
@@ -93,6 +94,9 @@ export default async function ProductoPage({ params }: { params: Promise<{ slug:
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      {tipo && (tipo === "min" || tipo === "max") && (
+        <CatalogTypeSync tipo={tipo} />
+      )}
       <ProductDetail product={productSerialized} />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-10">
         <Suspense fallback={

@@ -3,9 +3,9 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import Link from "next/link";
 import { buildWhatsAppUrl } from "@/lib/whatsapp";
 import { formatPrice } from "@/lib/utils";
+import { useCatalogType } from "@/components/catalog/CatalogTypeProvider";
 import { MessageCircle, Shield, Clock, ChevronLeft, ChevronRight } from "lucide-react";
 import Breadcrumbs from "./Breadcrumbs";
 import ShareButton from "./ShareButton";
@@ -24,12 +24,15 @@ interface ProductImage { id: number; url: string; altText: string | null; }
 interface Product {
   id: number; name: string; slug: string; description: string | null;
   warrantyMonths: number | null; productionDays: number | null;
+  retailPrice: number | null;
+  wholesalePrice: number | null;
   category: { id: number; name: string; slug: string };
   images: ProductImage[];
   variants: Variant[];
 }
 
 export default function ProductDetail({ product }: { product: Product }) {
+  const { catalogType } = useCatalogType();
   const [selectedImage, setSelectedImage] = useState(0);
   const [lightbox, setLightbox] = useState(false);
   const [selectedMaterial, setSelectedMaterial] = useState<number | null>(null);
@@ -62,14 +65,14 @@ export default function ProductDetail({ product }: { product: Product }) {
     ).values()
   );
 
-  // Variante seleccionada actual
+  // Variante seleccionada actual (solo para info WhatsApp)
   const selectedVariant = product.variants.find((v) => {
     if (selectedMaterial && v.material?.id !== selectedMaterial) return false;
     if (selectedMeasurement && v.measurement?.id !== selectedMeasurement) return false;
     return true;
   }) ?? product.variants[0];
 
-  const price = selectedVariant ? Number(selectedVariant.price) : null;
+  const price = catalogType === "max" ? product.wholesalePrice : product.retailPrice;
   const waUrl = selectedVariant
     ? buildWhatsAppUrl({
         productName: product.name,
@@ -77,7 +80,7 @@ export default function ProductDetail({ product }: { product: Product }) {
         measurement: selectedVariant.measurement?.label,
         price: price ?? undefined,
       })
-    : buildWhatsAppUrl({ productName: product.name });
+    : buildWhatsAppUrl({ productName: product.name, price: price ?? undefined });
 
   function prevImage() {
     setSelectedImage((i) => (i > 0 ? i - 1 : product.images.length - 1));

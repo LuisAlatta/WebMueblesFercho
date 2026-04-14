@@ -11,7 +11,6 @@ interface Product {
   slug: string;
   category: { name: string; slug: string };
   images: { url: string; altText?: string | null }[];
-  variants: { price: number | string }[];
   isFeatured?: boolean;
 }
 

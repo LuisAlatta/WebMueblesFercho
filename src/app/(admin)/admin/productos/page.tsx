@@ -27,6 +27,8 @@ interface Product {
   category: { name: string };
   images: { url: string; isPrimary: boolean }[];
   _count: { variants: number };
+  retailPrice: string | null;
+  wholesalePrice: string | null;
 }
 
 function ProductSkeleton() {
@@ -170,7 +172,7 @@ export default function ProductosPage() {
                 {products.map((p, i) => {
                   const img = p.images[0];
                   const noImage = p.images.length === 0;
-                  const noVariants = p._count.variants === 0;
+                  const noPrice = p.retailPrice === null || p.wholesalePrice === null;
                   return (
                     <motion.div
                       key={p.id}
@@ -206,16 +208,16 @@ export default function ProductosPage() {
                           </div>
                         </div>
                         <Badge variant="secondary" className="mt-1 text-xs">{p.category.name}</Badge>
-                        {(noImage || noVariants) && (
+                        {(noImage || noPrice) && (
                           <div className="flex flex-wrap gap-1 mt-1.5">
                             {noImage && (
                               <span className="inline-flex items-center gap-0.5 text-xs text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">
                                 <AlertTriangle className="w-3 h-3" /> Sin imagen
                               </span>
                             )}
-                            {noVariants && (
+                            {noPrice && (
                               <span className="inline-flex items-center gap-0.5 text-xs text-red-600 bg-red-50 px-1.5 py-0.5 rounded">
-                                <AlertTriangle className="w-3 h-3" /> Sin precio
+                                <AlertTriangle className="w-3 h-3" /> Faltan precios
                               </span>
                             )}
                           </div>
@@ -257,7 +259,7 @@ export default function ProductosPage() {
                   {products.map((p) => {
                     const img = p.images[0];
                     const noImage = p.images.length === 0;
-                    const noVariants = p._count.variants === 0;
+                    const noPrice = p.retailPrice === null || p.wholesalePrice === null;
                     return (
                       <tr
                         key={p.id}
@@ -281,9 +283,9 @@ export default function ProductosPage() {
                                     <AlertTriangle className="w-3 h-3" /> Sin imagen
                                   </span>
                                 )}
-                                {noVariants && (
+                                {noPrice && (
                                   <span className="inline-flex items-center gap-0.5 text-xs text-red-600 bg-red-50 px-1.5 py-0.5 rounded">
-                                    <AlertTriangle className="w-3 h-3" /> Sin precio
+                                    <AlertTriangle className="w-3 h-3" /> Faltan precios
                                   </span>
                                 )}
                               </div>

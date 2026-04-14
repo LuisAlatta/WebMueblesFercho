@@ -32,6 +32,7 @@ interface Product {
   id: number; name: string; slug: string; description: string | null;
   categoryId: number; isFeatured: boolean; isActive: boolean;
   warrantyMonths: number | null; productionDays: number | null;
+  retailPrice: number | null; wholesalePrice: number | null;
   category: Category;
   variants: Variant[];
 }
@@ -47,6 +48,7 @@ export default function EditProductoPage({ params }: { params: Promise<{ id: str
   const [form, setForm] = useState({
     name: "", categoryId: "", description: "",
     warrantyMonths: "", productionDays: "",
+    retailPrice: "", wholesalePrice: "",
     isFeatured: false, isActive: true,
   });
   // Nueva variante
@@ -79,6 +81,8 @@ export default function EditProductoPage({ params }: { params: Promise<{ id: str
         description: prod.description ?? "",
         warrantyMonths: prod.warrantyMonths ? String(prod.warrantyMonths) : "",
         productionDays: prod.productionDays ? String(prod.productionDays) : "",
+        retailPrice: prod.retailPrice ? String(prod.retailPrice) : "",
+        wholesalePrice: prod.wholesalePrice ? String(prod.wholesalePrice) : "",
         isFeatured: prod.isFeatured, isActive: prod.isActive,
       });
     } catch {
@@ -103,6 +107,8 @@ export default function EditProductoPage({ params }: { params: Promise<{ id: str
         categoryId: parseInt(form.categoryId),
         warrantyMonths: form.warrantyMonths ? parseInt(form.warrantyMonths) : null,
         productionDays: form.productionDays ? parseInt(form.productionDays) : null,
+        retailPrice: form.retailPrice ? parseFloat(form.retailPrice) : null,
+        wholesalePrice: form.wholesalePrice ? parseFloat(form.wholesalePrice) : null,
       }),
     });
     setSaving(false);
@@ -207,6 +213,17 @@ export default function EditProductoPage({ params }: { params: Promise<{ id: str
                 rows={4}
                 placeholder="Descripción del producto..."
               />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Precio Minorista (ARS)</Label>
+                <Input type="number" min="0" step="0.01" value={form.retailPrice} onChange={(e) => setF("retailPrice", e.target.value)} placeholder="0.00" />
+              </div>
+              <div className="space-y-2">
+                <Label>Precio Mayorista (ARS)</Label>
+                <Input type="number" min="0" step="0.01" value={form.wholesalePrice} onChange={(e) => setF("wholesalePrice", e.target.value)} placeholder="0.00" />
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">

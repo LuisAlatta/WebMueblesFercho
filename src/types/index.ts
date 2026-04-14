@@ -55,6 +55,8 @@ export interface ProductDetail extends ProductCard {
   description: string | null;
   warrantyMonths: number | null;
   productionDays: number | null;
+  retailPrice: number | null;
+  wholesalePrice: number | null;
   viewCount: number;
   createdAt: Date;
   updatedAt: Date;

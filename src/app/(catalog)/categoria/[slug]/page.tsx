@@ -50,13 +50,9 @@ export default async function CategoriaPage({
       isFeatured: true,
       category: { select: { name: true, slug: true } },
       images: { orderBy: { order: "asc" }, take: 1, select: { url: true, altText: true } },
-      variants: { where: { isActive: true }, select: { price: true }, orderBy: { price: "asc" } },
     },
   });
-  const products = raw.map((p) => ({
-    ...p,
-    variants: p.variants.map((v) => ({ price: Number(v.price) })),
-  }));
+  const products = raw;
 
   return (
     <div className="min-h-[calc(100dvh-72px)]">

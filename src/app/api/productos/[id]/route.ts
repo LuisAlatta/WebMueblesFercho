@@ -29,6 +29,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   const {
     name, description, categoryId, isFeatured, isActive,
     warrantyMonths, productionDays, order, images,
+    retailPrice, wholesalePrice,
   } = body;
 
   const data: Record<string, unknown> = {};
@@ -40,6 +41,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   if (warrantyMonths !== undefined) data.warrantyMonths = warrantyMonths;
   if (productionDays !== undefined) data.productionDays = productionDays;
   if (order !== undefined) data.order = order;
+  if (retailPrice !== undefined) data.retailPrice = retailPrice ? Number(retailPrice) : null;
+  if (wholesalePrice !== undefined) data.wholesalePrice = wholesalePrice ? Number(wholesalePrice) : null;
 
   const product = await prisma.product.update({ where: { id: parseInt(id) }, data });
 

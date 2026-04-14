@@ -39,6 +39,8 @@ model Product {
   isActive       Boolean          @default(true)
   warrantyMonths Int?
   productionDays Int?
+  retailPrice    Decimal?         @db.Decimal(10, 2)
+  wholesalePrice Decimal?         @db.Decimal(10, 2)
   order          Int              @default(0)
   viewCount      Int              @default(0)
   createdAt      DateTime         @default(now())

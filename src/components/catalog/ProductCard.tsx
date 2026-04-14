@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { formatPrice } from "@/lib/utils";
+import { useCatalogType } from "./CatalogTypeProvider";
 
 const BLUR_DATA_URL =
   "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNjciIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjY3IiBmaWxsPSIjZjBlY2U2Ii8+PC9zdmc+";
@@ -11,21 +11,17 @@ interface ProductCardProps {
   slug: string;
   category: { name: string; slug: string };
   images: { url: string; altText?: string | null }[];
-  variants: { price: number | string }[];
   isFeatured?: boolean;
 }
 
 export default function ProductCard({
-  name, slug, category, images, variants, isFeatured,
+  name, slug, category, images, isFeatured,
 }: ProductCardProps) {
   const img = images[0];
-  const prices = variants.map((v) => Number(v.price));
-  const minPrice = prices.length > 0 ? Math.min(...prices) : null;
-  const maxPrice = prices.length > 0 ? Math.max(...prices) : null;
-  const samePrice = minPrice === maxPrice;
+  const { catalogType } = useCatalogType();
 
   return (
-    <Link href={`/producto/${slug}`} className="group block overflow-hidden bg-[#f0ece6] active:scale-[0.97] transition-transform duration-150">
+    <Link href={`/producto/${slug}?tipo=${catalogType}`} className="group block overflow-hidden bg-[#f0ece6] active:scale-[0.97] transition-transform duration-150">
       {/* Imagen */}
       <div className="relative aspect-[3/5] overflow-hidden">
         {img ? (
@@ -67,20 +63,13 @@ export default function ProductCard({
       </div>
 
       {/* Info debajo */}
-      <div className="px-3 py-3 bg-white border-b border-gray-100">
-        <p className="text-[10px] text-[#C9A96E] font-semibold uppercase tracking-widest mb-0.5 truncate">
+      <div className="px-3 py-4 bg-white border-b border-gray-100 text-center">
+        <p className="text-[10px] text-[#C9A96E] font-semibold uppercase tracking-widest mb-1 mx-auto truncate text-center">
           {category.name}
         </p>
-        <h3 className="text-[#1C1C1E] text-xs sm:text-sm font-medium leading-snug line-clamp-2 group-hover:text-[#8B7355] transition-colors mb-1.5">
+        <h3 className="text-[#1C1C1E] text-xs sm:text-sm font-medium leading-snug line-clamp-2 group-hover:text-[#8B7355] transition-colors mx-auto text-center">
           {name}
         </h3>
-        {minPrice !== null ? (
-          <p className="text-[#C9A96E] font-bold text-sm sm:text-base">
-            {samePrice ? formatPrice(minPrice) : `Desde ${formatPrice(minPrice)}`}
-          </p>
-        ) : (
-          <p className="text-[#999] text-xs">Consultar precio</p>
-        )}
       </div>
     </Link>
   );
