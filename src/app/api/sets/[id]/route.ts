@@ -27,7 +27,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
   const { id } = await params;
   const body = await req.json();
-  const { name, description, categoryId, imageUrl, imagePublicId, isActive, addProductId, removeItemId } = body;
+  const { name, description, categoryId, imageUrl, imagePublicId, isActive, isFeatured, addProductId, removeItemId } = body;
 
   // Add a product to the set
   if (addProductId) {
@@ -55,6 +55,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   if (imageUrl !== undefined) data.imageUrl = imageUrl || null;
   if (imagePublicId !== undefined) data.imagePublicId = imagePublicId || null;
   if (isActive !== undefined) data.isActive = isActive;
+  if (isFeatured !== undefined) data.isFeatured = isFeatured;
 
   const set = await prisma.productSet.update({ where: { id: parseInt(id) }, data });
   return NextResponse.json(set);

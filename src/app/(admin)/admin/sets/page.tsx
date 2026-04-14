@@ -7,7 +7,7 @@ import ConfirmDialog, { useConfirmDialog } from "@/components/admin/ConfirmDialo
 import EmptyState from "@/components/admin/EmptyState";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Pencil, Trash2, ToggleLeft, ToggleRight, Sofa } from "lucide-react";
+import { Plus, Pencil, Trash2, ToggleLeft, ToggleRight, Sofa, Star } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
 import Image from "next/image";
@@ -21,6 +21,7 @@ interface ProductSet {
   imageUrl: string | null;
   description: string | null;
   category: { name: string } | null;
+  isFeatured: boolean;
   items: { id: number; product: { id: number; name: string } }[];
 }
 
@@ -100,6 +101,20 @@ export default function SetsPage() {
     });
     if (res.ok) {
       toast.success(set.isActive ? "Set desactivado" : "Set activado");
+      load();
+    } else {
+      toast.error("Error al actualizar");
+    }
+  }
+
+  async function togglePromo(set: ProductSet) {
+    const res = await fetch(`/api/sets/${set.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ isFeatured: !set.isFeatured }),
+    });
+    if (res.ok) {
+      toast.success(set.isFeatured ? "Quitado de promociones" : "Agregado a promociones");
       load();
     } else {
       toast.error("Error al actualizar");
@@ -191,6 +206,10 @@ export default function SetsPage() {
                           ? <><ToggleRight className="w-4 h-4 text-green-500" /><span className="text-green-600 font-medium">Activo</span></>
                           : <><ToggleLeft className="w-4 h-4 text-gray-400" /><span className="text-gray-400">Inactivo</span></>}
                       </button>
+                      <button onClick={() => togglePromo(set)} className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-100">
+                        <Star className={`w-3 h-3 ${set.isFeatured ? "fill-amber-500 text-amber-500" : "text-amber-400"}`} />
+                        <span>En Promoción</span>
+                      </button>
                     </div>
                   </div>
                 </motion.div>
@@ -205,6 +224,7 @@ export default function SetsPage() {
                     <th className="text-left px-5 py-3 font-medium text-[#7A7A7A]">Set</th>
                     <th className="text-left px-5 py-3 font-medium text-[#7A7A7A]">Categoría</th>
                     <th className="text-left px-5 py-3 font-medium text-[#7A7A7A]">Productos</th>
+                    <th className="text-left px-5 py-3 font-medium text-[#7A7A7A]">Promo</th>
                     <th className="text-left px-5 py-3 font-medium text-[#7A7A7A]">Estado</th>
                     <th className="px-5 py-3" />
                   </tr>
@@ -237,6 +257,15 @@ export default function SetsPage() {
                       </td>
                       <td className="px-5 py-3 text-[#7A7A7A]">
                         {set.items.length} producto{set.items.length !== 1 ? "s" : ""}
+                      </td>
+                      <td className="px-5 py-3">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); togglePromo(set); }}
+                          className={`flex items-center gap-1.5 px-2 py-1 rounded-md transition-colors ${set.isFeatured ? "bg-amber-50 text-amber-600" : "text-gray-400 hover:text-amber-500"}`}
+                        >
+                          <Star className={`w-4 h-4 ${set.isFeatured ? "fill-amber-500" : ""}`} />
+                          <span className="text-xs font-medium">{set.isFeatured ? "En Promoción" : "Destacar"}</span>
+                        </button>
                       </td>
                       <td className="px-5 py-3">
                         <button

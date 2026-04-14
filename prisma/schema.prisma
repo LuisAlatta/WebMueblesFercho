@@ -111,6 +111,7 @@ model ProductSet {
   imageUrl      String?
   imagePublicId String?
   isActive      Boolean          @default(true)
+  isFeatured    Boolean          @default(false)
   items         ProductSetItem[]
 }
 

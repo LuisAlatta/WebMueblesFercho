@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { ArrowLeft, Loader2, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Loader2, Plus, Trash2, Star } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
 
@@ -34,6 +34,7 @@ export default function EditSetPage() {
     imageUrl: "",
     imagePublicId: "",
     isActive: true,
+    isFeatured: false,
   });
 
   useEffect(() => {
@@ -50,6 +51,7 @@ export default function EditSetPage() {
           imageUrl: setData.imageUrl ?? "",
           imagePublicId: setData.imagePublicId ?? "",
           isActive: setData.isActive ?? true,
+          isFeatured: setData.isFeatured ?? false,
         });
         setItems(setData.items ?? []);
         setCategories(cats);
@@ -80,6 +82,7 @@ export default function EditSetPage() {
         imageUrl: form.imageUrl || null,
         imagePublicId: form.imagePublicId || null,
         isActive: form.isActive,
+        isFeatured: form.isFeatured,
       }),
     });
     setSaving(false);
@@ -193,9 +196,23 @@ export default function EditSetPage() {
               <Label>Activo (visible en el catálogo)</Label>
               <Switch
                 checked={form.isActive}
-                onCheckedChange={(v) => set("isActive", v)}
-              />
-            </div>
+                  onCheckedChange={(v) => set("isActive", v)}
+                />
+              </div>
+
+              <div className="flex items-center justify-between py-2 border-t border-gray-50 pt-4">
+                <div className="space-y-0.5">
+                  <div className="flex items-center gap-2">
+                    <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
+                    <Label className="text-sm font-medium">En Promoción</Label>
+                  </div>
+                  <p className="text-[12px] text-gray-500">Aparecerá en la sección principal de Promociones</p>
+                </div>
+                <Switch
+                  checked={form.isFeatured}
+                  onCheckedChange={(v) => set("isFeatured", v)}
+                />
+              </div>
 
             <div className="flex gap-3 pt-2 flex-wrap">
               <Button type="submit" disabled={saving} className="bg-[#1C1C1E] hover:bg-[#2C2C2E] text-white">

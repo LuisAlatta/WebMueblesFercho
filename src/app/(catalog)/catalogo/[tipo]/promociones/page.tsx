@@ -36,7 +36,7 @@ export default async function PromocionesPage({ params }: Props) {
       },
     }),
     prisma.productSet.findMany({
-      where: { isActive: true },
+      where: { isActive: true, isFeatured: true },
       include: {
         items: {
           include: {

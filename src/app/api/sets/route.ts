@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 
-  const { name, description, categoryId, imageUrl, imagePublicId } = await req.json();
+  const { name, description, categoryId, imageUrl, imagePublicId, isFeatured } = await req.json();
   if (!name) return NextResponse.json({ error: "El nombre es requerido" }, { status: 400 });
 
   const set = await prisma.productSet.create({
@@ -32,6 +32,7 @@ export async function POST(req: NextRequest) {
       categoryId: categoryId ? parseInt(categoryId) : null,
       imageUrl: imageUrl || null,
       imagePublicId: imagePublicId || null,
+      isFeatured: isFeatured || false,
     },
   });
   return NextResponse.json(set, { status: 201 });
