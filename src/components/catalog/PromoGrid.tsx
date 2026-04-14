@@ -147,7 +147,7 @@ export default function PromoGrid({ products, sets }: PromoGridProps) {
               className="text-xl font-bold text-[#1C1C1E]"
               style={{ fontFamily: "var(--font-playfair)" }}
             >
-              Sets de muebles
+              Combos de muebles
             </h2>
             <span className="text-xs bg-[#1C1C1E] text-white font-bold px-2 py-0.5 rounded-full">
               {sets.length}
@@ -158,7 +158,7 @@ export default function PromoGrid({ products, sets }: PromoGridProps) {
             {sets.map((s) => {
               const coverImg = s.imageUrl || s.items[0]?.product.images[0]?.url || null;
 
-              // Calcular precio total del set
+              // Calcular precio total del combo
               const totalRetail = s.items.reduce((acc, item) => {
                 return acc + (item.product.retailPrice ?? 0) * item.quantity;
               }, 0);
@@ -190,7 +190,7 @@ export default function PromoGrid({ products, sets }: PromoGridProps) {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                     <div className="absolute bottom-3 left-3">
                       <span className="bg-[#C9A96E] text-white text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full">
-                        Set completo
+                        Combo completo
                       </span>
                     </div>
                   </div>
@@ -206,7 +206,7 @@ export default function PromoGrid({ products, sets }: PromoGridProps) {
                       <p className="text-xs text-[#7A7A7A] mb-3 line-clamp-2">{s.description}</p>
                     )}
 
-                    {/* Productos del set */}
+                    {/* Productos del combo */}
                     <div className="space-y-1 mb-4">
                       {s.items.map((item) => (
                         <div key={item.id} className="flex items-center gap-2 text-xs text-[#2C2C2C]">
@@ -228,7 +228,7 @@ export default function PromoGrid({ products, sets }: PromoGridProps) {
                         )}
                       </div>
                       <a
-                        href={`https://wa.me/51${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? ""}?text=${encodeURIComponent(`Hola! Me interesa el set "${s.name}". ¿Pueden darme más información?`)}`}
+                        href={`https://wa.me/51${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? ""}?text=${encodeURIComponent(`Hola! Me interesa el combo "${s.name}". ¿Pueden darme más información?`)}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center gap-1.5 bg-green-500 hover:bg-green-600 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition-colors"

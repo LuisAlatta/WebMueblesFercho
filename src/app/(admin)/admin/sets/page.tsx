@@ -26,7 +26,7 @@ interface ProductSet {
 }
 
 /* Skeleton for loading state */
-function SetsSkeleton() {
+function CombosSkeleton() {
   return (
     <>
       {/* Mobile skeleton */}
@@ -73,7 +73,7 @@ function SetsSkeleton() {
   );
 }
 
-export default function SetsPage() {
+export default function CombosPage() {
   const [sets, setSets] = useState<ProductSet[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
@@ -86,7 +86,7 @@ export default function SetsPage() {
       const data = await res.json();
       setSets(data);
     } else {
-      toast.error("Error al cargar sets");
+      toast.error("Error al cargar combos");
     }
     setLoading(false);
   }
@@ -100,7 +100,7 @@ export default function SetsPage() {
       body: JSON.stringify({ isActive: !set.isActive }),
     });
     if (res.ok) {
-      toast.success(set.isActive ? "Set desactivado" : "Set activado");
+      toast.success(set.isActive ? "Combo desactivado" : "Combo activado");
       load();
     } else {
       toast.error("Error al actualizar");
@@ -123,14 +123,14 @@ export default function SetsPage() {
 
   function remove(set: ProductSet) {
     confirm({
-      title: `¿Eliminar el set "${set.name}"?`,
-      description: "Esta acción no se puede deshacer. Los productos del set no serán eliminados.",
+      title: `¿Eliminar el combo "${set.name}"?`,
+      description: "Esta acción no se puede deshacer. Los productos del combo no serán eliminados.",
       confirmLabel: "Eliminar",
       variant: "danger",
       onConfirm: async () => {
         const res = await fetch(`/api/sets/${set.id}`, { method: "DELETE" });
         if (res.ok) {
-          toast.success("Set eliminado");
+          toast.success("Combo eliminado");
           load();
         } else {
           toast.error("Error al eliminar");
@@ -141,7 +141,7 @@ export default function SetsPage() {
 
   return (
     <>
-      <AdminTopBar title="Sets de productos" />
+      <AdminTopBar title="Combos de productos" />
       <main className="flex-1 overflow-y-auto p-4 sm:p-6">
 
         <div className="flex flex-col sm:flex-row gap-3 mb-5">
@@ -152,19 +152,19 @@ export default function SetsPage() {
           </div>
           <Link href="/admin/sets/nuevo" className="sm:ml-auto">
             <Button className="w-full sm:w-auto bg-[#1C1C1E] hover:bg-[#2C2C2E] text-white">
-              <Plus className="w-4 h-4 mr-2" /> Nuevo set
+              <Plus className="w-4 h-4 mr-2" /> Nuevo combo
             </Button>
           </Link>
         </div>
 
         {loading ? (
-          <SetsSkeleton />
+          <CombosSkeleton />
         ) : sets.length === 0 ? (
           <EmptyState
             icon={Sofa}
-            title="No hay sets creados aún"
-            description="Agrupa productos que combinan bien juntos para mostrarlos como set."
-            actionLabel="Crear primer set"
+            title="No hay combos creados aún"
+            description="Agrupa productos que combinan bien juntos para mostrarlos como combo."
+            actionLabel="Crear primer combo"
             actionHref="/admin/sets/nuevo"
           />
         ) : (
@@ -221,7 +221,7 @@ export default function SetsPage() {
               <table className="w-full text-sm">
                 <thead className="bg-[#FAF9F7] border-b border-gray-100">
                   <tr>
-                    <th className="text-left px-5 py-3 font-medium text-[#7A7A7A]">Set</th>
+                    <th className="text-left px-5 py-3 font-medium text-[#7A7A7A]">Combo</th>
                     <th className="text-left px-5 py-3 font-medium text-[#7A7A7A]">Categoría</th>
                     <th className="text-left px-5 py-3 font-medium text-[#7A7A7A]">Productos</th>
                     <th className="text-left px-5 py-3 font-medium text-[#7A7A7A]">Promo</th>

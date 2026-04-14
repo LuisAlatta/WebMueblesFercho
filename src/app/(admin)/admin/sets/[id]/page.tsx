@@ -18,7 +18,7 @@ interface Category { id: number; name: string; }
 interface Product { id: number; name: string; slug: string; }
 interface SetItem { id: number; product: Product; }
 
-export default function EditSetPage() {
+export default function EditComboPage() {
   const router = useRouter();
   const { id } = useParams<{ id: string }>();
   const [loading, setLoading] = useState(true);
@@ -59,7 +59,7 @@ export default function EditSetPage() {
         setLoading(false);
       })
       .catch(() => {
-        toast.error("Error al cargar el set");
+        toast.error("Error al cargar el combo");
         router.push("/admin/sets");
       });
   }, [id]);
@@ -87,7 +87,7 @@ export default function EditSetPage() {
     });
     setSaving(false);
     if (res.ok) {
-      toast.success("Set actualizado");
+      toast.success("Combo actualizado");
       router.push("/admin/sets");
     } else {
       const err = await res.json();
@@ -103,7 +103,7 @@ export default function EditSetPage() {
       body: JSON.stringify({ addProductId: parseInt(addingProductId) }),
     });
     if (res.ok) {
-      toast.success("Producto agregado al set");
+      toast.success("Producto agregado al combo");
       setAddingProductId("");
       // Reload items
       const updated = await fetch(`/api/sets/${id}`).then((r) => r.json());
@@ -115,7 +115,7 @@ export default function EditSetPage() {
   }
 
   async function removeItem(itemId: number) {
-    if (!confirm("¿Quitar este producto del set?")) return;
+    if (!confirm("¿Quitar este producto del combo?")) return;
     const res = await fetch(`/api/sets/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -135,7 +135,7 @@ export default function EditSetPage() {
   if (loading) {
     return (
       <>
-        <AdminTopBar title="Editar set" />
+        <AdminTopBar title="Editar combo" />
         <div className="flex justify-center py-12">
           <Loader2 className="w-6 h-6 animate-spin text-[#7A7A7A]" />
         </div>
@@ -155,7 +155,7 @@ export default function EditSetPage() {
 
           {/* Datos del set */}
           <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-gray-100 p-4 sm:p-6 space-y-4">
-            <h2 className="font-semibold text-[#1C1C1E]">Datos del set</h2>
+            <h2 className="font-semibold text-[#1C1C1E]">Datos del combo</h2>
 
             <div className="space-y-2">
               <Label>Nombre *</Label>
@@ -181,7 +181,7 @@ export default function EditSetPage() {
 
             <div className="space-y-2">
               <Label>Descripción</Label>
-              <Textarea value={form.description} onChange={(e) => set("description", e.target.value)} rows={3} />
+              <Textarea value={form.description} onChange={(e) => set("description", e.target.value)} placeholder="Ej: Este combo incluye sofá y mesa de centro..." rows={3} />
             </div>
 
             <SingleImageUpload
@@ -189,7 +189,7 @@ export default function EditSetPage() {
               onChange={(url, publicId) => setForm((p) => ({ ...p, imageUrl: url, imagePublicId: publicId }))}
               onClear={() => setForm((p) => ({ ...p, imageUrl: "", imagePublicId: "" }))}
               folder="muebles-fercho/sets"
-              label="Imagen del set"
+              label="Imagen del combo"
             />
 
             <div className="flex items-center justify-between py-1">
@@ -226,7 +226,7 @@ export default function EditSetPage() {
 
           {/* Productos del set */}
           <div className="bg-white rounded-xl border border-gray-100 p-4 sm:p-6 space-y-4">
-            <h2 className="font-semibold text-[#1C1C1E]">Productos del set ({items.length})</h2>
+            <h2 className="font-semibold text-[#1C1C1E]">Productos del combo ({items.length})</h2>
 
             {/* Agregar producto */}
             <div className="flex gap-2">

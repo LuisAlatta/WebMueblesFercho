@@ -55,7 +55,7 @@ export default function CategoryGrid({ categories, tipo }: CategoryGridProps) {
             Promociones
           </h2>
           <p className="text-[#C9A96E]/80 text-[10px] sm:text-xs font-medium uppercase tracking-[0.2em]">
-            Sets y Especiales
+            Combos y Especiales
           </p>
         </div>
         <div className="absolute top-3 sm:top-4 right-3 sm:right-4 z-10">

@@ -34,7 +34,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     const existing = await prisma.productSetItem.findFirst({
       where: { setId: parseInt(id), productId: addProductId },
     });
-    if (existing) return NextResponse.json({ error: "El producto ya está en el set" }, { status: 400 });
+    if (existing) return NextResponse.json({ error: "El producto ya está en el combo" }, { status: 400 });
     await prisma.productSetItem.create({
       data: { setId: parseInt(id), productId: addProductId, quantity: 1 },
     });

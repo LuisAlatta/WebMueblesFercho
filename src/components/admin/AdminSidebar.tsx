@@ -27,7 +27,7 @@ const navItems = [
   { href: "/admin/categorias", label: "Categorías", icon: Tag },
   { href: "/admin/materiales", label: "Materiales", icon: Layers },
   { href: "/admin/medidas", label: "Medidas", icon: Ruler },
-  { href: "/admin/sets", label: "Sets", icon: Sofa },
+  { href: "/admin/sets", label: "Combos", icon: Sofa },
   { href: "/admin/carga-masiva", label: "Carga masiva", icon: UploadCloud },
   { href: "/admin/galeria", label: "Galería", icon: Images },
   { href: "/admin/testimonios", label: "Testimonios", icon: Star },

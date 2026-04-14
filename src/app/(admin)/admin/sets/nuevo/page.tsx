@@ -16,7 +16,7 @@ import Link from "next/link";
 
 interface Category { id: number; name: string; }
 
-export default function NuevoSetPage() {
+export default function NuevoComboPage() {
   const router = useRouter();
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
@@ -55,7 +55,7 @@ export default function NuevoSetPage() {
     });
     setLoading(false);
     if (res.ok) {
-      toast.success("Set creado");
+      toast.success("Combo creado");
       router.push("/admin/sets");
     } else {
       const err = await res.json();
@@ -65,7 +65,7 @@ export default function NuevoSetPage() {
 
   return (
     <>
-      <AdminTopBar title="Nuevo set" />
+      <AdminTopBar title="Nuevo combo" />
       <main className="flex-1 overflow-y-auto p-4 sm:p-6">
         <Link href="/admin/sets" className="inline-flex items-center gap-1.5 text-sm text-[#7A7A7A] hover:text-[#1C1C1E] mb-6 transition-colors">
           <ArrowLeft className="w-4 h-4" /> Volver
@@ -97,7 +97,7 @@ export default function NuevoSetPage() {
 
             <div className="space-y-2">
               <Label>Descripción (opcional)</Label>
-              <Textarea value={form.description} onChange={(e) => set("description", e.target.value)} placeholder="Descripción del set" rows={3} />
+              <Textarea value={form.description} onChange={(e) => set("description", e.target.value)} placeholder="Descripción del combo" rows={3} />
             </div>
 
             <SingleImageUpload
@@ -105,7 +105,7 @@ export default function NuevoSetPage() {
               onChange={(url, publicId) => setForm((p) => ({ ...p, imageUrl: url, imagePublicId: publicId }))}
               onClear={() => setForm((p) => ({ ...p, imageUrl: "", imagePublicId: "" }))}
               folder="muebles-fercho/sets"
-              label="Imagen del set"
+              label="Imagen del combo"
             />
 
             <div className="flex items-center justify-between py-2 border-t border-gray-50 pt-4">
@@ -124,7 +124,7 @@ export default function NuevoSetPage() {
 
             <div className="flex gap-3 pt-2">
               <Button type="submit" disabled={loading} className="bg-[#1C1C1E] hover:bg-[#2C2C2E] text-white">
-                {loading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Guardando...</> : "Crear set"}
+                {loading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Guardando...</> : "Crear combo"}
               </Button>
               <Link href="/admin/sets">
                 <Button type="button" variant="outline">Cancelar</Button>
