@@ -88,21 +88,23 @@ export default async function CatalogoPage({ params, searchParams }: Props) {
         {/* Contenido principal */}
         <div className="flex-1 min-w-0">
           {/* Header del catálogo */}
-          <div className="flex items-center justify-between mb-5 gap-3">
-            <div className="min-w-0">
+          <div className="flex flex-col mb-6 gap-4">
+            <div>
               <h1
-                className="text-lg sm:text-xl font-bold text-[#1C1C1E] truncate"
+                className="text-2xl sm:text-3xl font-bold text-[#1C1C1E]"
                 style={{ fontFamily: "var(--font-playfair)" }}
               >
                 {title}
               </h1>
-              <p className="text-xs sm:text-sm text-[#7A7A7A] mt-0.5">{products.length} productos</p>
+              <p className="text-sm text-[#7A7A7A] mt-1">{products.length} productos</p>
             </div>
 
             {/* Controles filtros + orden */}
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="flex items-center gap-2 justify-end w-full border-t border-gray-100 pt-3 lg:border-none lg:pt-0 lg:justify-start">
               {/* Botón filtros mobile */}
-              <MobileFilterDrawer categories={categories} materials={materials} active={filters} />
+              <div className="lg:hidden">
+                <MobileFilterDrawer categories={categories} materials={materials} active={filters} />
+              </div>
               {/* Ordenamiento */}
               <OrdenSelect current={filters.orden} />
             </div>
