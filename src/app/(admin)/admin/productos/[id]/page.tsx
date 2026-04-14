@@ -221,23 +221,12 @@ export default function EditProductoPage({ params }: { params: Promise<{ id: str
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Precio Minorista (ARS)</Label>
+                <Label>Precio Minorista (S/.)</Label>
                 <Input type="number" min="0" step="0.01" value={form.retailPrice} onChange={(e) => setF("retailPrice", e.target.value)} placeholder="0.00" />
               </div>
               <div className="space-y-2">
-                <Label>Precio Mayorista (ARS)</Label>
+                <Label>Precio Mayorista (S/.)</Label>
                 <Input type="number" min="0" step="0.01" value={form.wholesalePrice} onChange={(e) => setF("wholesalePrice", e.target.value)} placeholder="0.00" />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Garantía (meses)</Label>
-                <Input type="number" min="0" value={form.warrantyMonths} onChange={(e) => setF("warrantyMonths", e.target.value)} placeholder="12" />
-              </div>
-              <div className="space-y-2">
-                <Label>Días fabricación</Label>
-                <Input type="number" min="0" value={form.productionDays} onChange={(e) => setF("productionDays", e.target.value)} placeholder="15" />
               </div>
             </div>
 
@@ -296,7 +285,7 @@ export default function EditProductoPage({ params }: { params: Promise<{ id: str
                           }
                         }}
                       />
-                      <span className="text-xs text-[#7A7A7A]">ARS</span>
+                      <span className="text-xs text-[#7A7A7A]">S/.</span>
                       {v.stock !== null && (
                         <span className="text-xs text-[#7A7A7A] ml-2">Stock: {v.stock}</span>
                       )}

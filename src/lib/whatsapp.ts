@@ -15,9 +15,9 @@ export function buildWhatsAppUrl(params: WhatsAppMessageParams): string {
     message += ` en ${details}`;
   }
   if (price) {
-    const formatted = new Intl.NumberFormat("es-AR", {
+    const formatted = new Intl.NumberFormat("es-PE", {
       style: "currency",
-      currency: "ARS",
+      currency: "PEN",
       minimumFractionDigits: 0,
     }).format(Number(price));
     message += ` (${formatted})`;

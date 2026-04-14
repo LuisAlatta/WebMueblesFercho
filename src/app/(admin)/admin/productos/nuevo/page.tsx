@@ -119,42 +119,21 @@ export default function NuevoProductoPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Precio Minorista (ARS)</Label>
+                <Label>Precio Minorista (S/.)</Label>
                 <Input
                   type="number" min="0" step="0.01"
                   value={form.retailPrice}
                   onChange={(e) => set("retailPrice", e.target.value)}
-                  placeholder="Ej: 150000"
+                  placeholder="Ej: 1500"
                 />
               </div>
               <div className="space-y-2">
-                <Label>Precio Mayorista (ARS)</Label>
+                <Label>Precio Mayorista (S/.)</Label>
                 <Input
                   type="number" min="0" step="0.01"
                   value={form.wholesalePrice}
                   onChange={(e) => set("wholesalePrice", e.target.value)}
                   placeholder="Ej: 120000"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Garantía (meses)</Label>
-                <Input
-                  type="number" min="0"
-                  value={form.warrantyMonths}
-                  onChange={(e) => set("warrantyMonths", e.target.value)}
-                  placeholder="Ej: 12"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Días de fabricación</Label>
-                <Input
-                  type="number" min="0"
-                  value={form.productionDays}
-                  onChange={(e) => set("productionDays", e.target.value)}
-                  placeholder="Ej: 15"
                 />
               </div>
             </div>

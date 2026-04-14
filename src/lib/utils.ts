@@ -7,9 +7,9 @@ export function cn(...inputs: ClassValue[]) {
 
 export function formatPrice(price: number | string): string {
   const num = typeof price === "string" ? parseFloat(price) : price;
-  return new Intl.NumberFormat("es-AR", {
+  return new Intl.NumberFormat("es-PE", {
     style: "currency",
-    currency: "ARS",
+    currency: "PEN",
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(num);
