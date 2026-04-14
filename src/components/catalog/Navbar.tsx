@@ -75,15 +75,11 @@ export default function Navbar({ businessName }: { businessName: string }) {
 
         {/* Logo */}
         <Link href="/" className="shrink-0">
-          <span
-            className="block text-xl font-bold text-white leading-tight"
-            style={{ fontFamily: "var(--font-playfair)" }}
-          >
-            {businessName}
-          </span>
-          <span className="block text-[10px] text-[#C9A96E] uppercase tracking-[0.2em] font-medium">
-            Fabricación a medida
-          </span>
+          <img
+            src="/images/image-removebg-preview.png"
+            alt="Muebles Fercho"
+            className="h-12 w-auto object-contain"
+          />
         </Link>
 
         {/* Nav desktop */}
