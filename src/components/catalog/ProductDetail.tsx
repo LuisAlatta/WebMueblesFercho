@@ -119,7 +119,7 @@ export default function ProductDetail({ product }: { product: Product }) {
     </div>
     <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-4 pb-6 sm:py-10">
       <Breadcrumbs items={[
-        { label: product.category.name, href: `/categoria/${product.category.slug}` },
+        { label: product.category.name, categorySlug: product.category.slug },
         { label: product.name },
       ]} />
 
