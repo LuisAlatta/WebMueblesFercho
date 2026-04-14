@@ -235,7 +235,7 @@ export default function EditProductoPage({ params }: { params: Promise<{ id: str
               <Switch checked={form.isActive} onCheckedChange={(v) => setF("isActive", v)} />
             </div>
             <div className="flex items-center justify-between">
-              <Label>Destacado</Label>
+              <Label>En Promoción</Label>
               <Switch checked={form.isFeatured} onCheckedChange={(v) => setF("isFeatured", v)} />
             </div>
 

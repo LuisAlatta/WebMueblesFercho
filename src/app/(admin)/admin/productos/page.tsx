@@ -106,7 +106,7 @@ export default function ProductosPage() {
       body: JSON.stringify({ [field]: !current }),
     });
     if (res.ok) {
-      toast.success(field === "isActive" ? (current ? "Desactivado" : "Activado") : (current ? "Quitado de destacados" : "Marcado como destacado"));
+      toast.success(field === "isActive" ? (current ? "Desactivado" : "Activado") : (current ? "Quitado de promoción" : "Añadido a promoción"));
       load();
     } else {
       toast.error("Error al actualizar");
@@ -230,8 +230,8 @@ export default function ProductosPage() {
                           </button>
                           <button onClick={() => toggle(p.id, "isFeatured", p.isFeatured)} className="flex items-center gap-1.5 text-xs">
                             {p.isFeatured
-                              ? <><Star className="w-3.5 h-3.5 text-[#C9A96E] fill-[#C9A96E]" /><span className="text-[#C9A96E] font-medium">Destacado</span></>
-                              : <><StarOff className="w-3.5 h-3.5 text-gray-300" /><span className="text-gray-400">Sin destacar</span></>}
+                              ? <><Star className="w-3.5 h-3.5 text-[#C9A96E] fill-[#C9A96E]" /><span className="text-[#C9A96E] font-medium">En Promoción</span></>
+                              : <><StarOff className="w-3.5 h-3.5 text-gray-300" /><span className="text-gray-400">Normal</span></>}
                           </button>
                           <span className="text-xs text-[#7A7A7A] ml-auto">{p._count.variants} var.</span>
                         </div>
@@ -251,7 +251,7 @@ export default function ProductosPage() {
                     <th className="text-left px-5 py-3 font-medium text-[#7A7A7A]">Categoría</th>
                     <th className="text-left px-5 py-3 font-medium text-[#7A7A7A]">Variantes</th>
                     <th className="text-left px-5 py-3 font-medium text-[#7A7A7A]">Estado</th>
-                    <th className="text-left px-5 py-3 font-medium text-[#7A7A7A]">Destacado</th>
+                    <th className="text-left px-5 py-3 font-medium text-[#7A7A7A]">Promoción</th>
                     <th className="px-5 py-3" />
                   </tr>
                 </thead>

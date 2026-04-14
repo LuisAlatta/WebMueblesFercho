@@ -262,7 +262,7 @@ export default function NuevoProductoPage() {
               <Switch checked={form.isActive} onCheckedChange={(v) => set("isActive", v)} />
             </div>
             <div className="flex items-center justify-between py-1">
-              <Label>Destacado</Label>
+              <Label>En Promoción</Label>
               <Switch checked={form.isFeatured} onCheckedChange={(v) => set("isFeatured", v)} />
             </div>
 
