@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
 
   if (format === "heic") {
     try {
-      buffer = await sharp(buffer).jpeg({ quality: 85 }).toBuffer();
+      buffer = Buffer.from(await sharp(buffer).jpeg({ quality: 85 }).toBuffer());
       fileName = fileName.replace(/\.[^.]+$/, "") + ".jpg";
       mimeType = "image/jpeg";
     } catch {

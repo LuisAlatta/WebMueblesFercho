@@ -2,16 +2,16 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Muebles Fercho — Muebles a Medida",
-    short_name: "Muebles Fercho",
-    description:
-      "Fabricamos muebles de madera, melamina y MDF a medida. Calidad artesanal, precios accesibles.",
-    start_url: "/",
+    name: "Muebles Fercho Admin",
+    short_name: "Fercho Admin",
+    description: "Panel de administración de Muebles Fercho",
+    start_url: "/login",
+    scope: "/",
     display: "standalone",
-    background_color: "#FAF9F7",
+    background_color: "#1C1C1E",
     theme_color: "#1C1C1E",
     orientation: "portrait-primary",
-    categories: ["shopping", "lifestyle"],
+    categories: ["business", "productivity"],
     lang: "es",
     dir: "ltr",
     icons: [
@@ -36,6 +36,16 @@ export default function manifest(): MetadataRoute.Manifest {
         sizes: "512x512",
         type: "image/png",
         purpose: "maskable",
+      },
+    ],
+    shortcuts: [
+      {
+        name: "Productos",
+        url: "/admin/productos",
+      },
+      {
+        name: "Configuración",
+        url: "/admin/configuracion",
       },
     ],
   };
