@@ -1,6 +1,8 @@
 import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import ContactForm from "@/components/catalog/ContactForm";
+import StoreLocation from "@/components/catalog/StoreLocation";
+import { getStoreLocation } from "@/lib/getStoreLocation";
 import { Phone, Mail, MapPin, MessageCircle } from "lucide-react";
 
 export const metadata: Metadata = { title: "Contacto" };
@@ -8,9 +10,11 @@ export const revalidate = 3600;
 
 export default async function ContactoPage() {
   const config = await prisma.siteConfig.findUnique({ where: { id: 1 } });
+  const store = await getStoreLocation();
   const wa = config?.whatsapp;
 
   return (
+    <>
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16">
       <div className="text-center mb-12">
         <h1
@@ -99,5 +103,7 @@ export default async function ContactoPage() {
         <ContactForm whatsapp={wa} />
       </div>
     </div>
+    <StoreLocation config={store.config} photos={store.photos} />
+    </>
   );
 }

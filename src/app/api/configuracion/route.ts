@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 
 export async function GET() {
   let config = await prisma.siteConfig.findUnique({ where: { id: 1 } });
@@ -23,5 +24,6 @@ export async function PUT(req: NextRequest) {
     update: body,
     create: { id: 1, ...body },
   });
+  revalidatePath("/", "layout");
   return NextResponse.json(config);
 }

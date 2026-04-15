@@ -5,6 +5,8 @@ import FilterSidebar from "@/components/catalog/FilterSidebar";
 import ActiveFilters from "@/components/catalog/ActiveFilters";
 import OrdenSelect from "@/components/catalog/OrdenSelect";
 import CategoryGrid from "@/components/catalog/CategoryGrid";
+import StoreLocation from "@/components/catalog/StoreLocation";
+import { getStoreLocation } from "@/lib/getStoreLocation";
 import { toSearchQuery } from "@/lib/utils";
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
@@ -87,6 +89,7 @@ export default async function CatalogoPage({ params, searchParams }: Props) {
   ]);
 
   const products = showingProducts ? await getProducts(filters, tipo as CatalogType) : [];
+  const store = await getStoreLocation();
 
   const activeCategory = categories.find((c) => c.slug === filters.categoria);
   const baseTitle = filters.search
@@ -98,6 +101,7 @@ export default async function CatalogoPage({ params, searchParams }: Props) {
   const title = tipo === "max" && showingProducts ? `${baseTitle} — Mayorista` : baseTitle;
 
   return (
+    <>
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-10">
       <CatalogTypeSync tipo={tipo as CatalogType} />
 
@@ -155,5 +159,7 @@ export default async function CatalogoPage({ params, searchParams }: Props) {
         </div>
       )}
     </div>
+    <StoreLocation config={store.config} photos={store.photos} />
+    </>
   );
 }

@@ -5,6 +5,8 @@ import { after } from "next/server";
 import { Metadata } from "next";
 import ProductDetail from "@/components/catalog/ProductDetail";
 import RelatedProducts from "@/components/catalog/RelatedProducts";
+import StoreLocation from "@/components/catalog/StoreLocation";
+import { getStoreLocation } from "@/lib/getStoreLocation";
 import { getSiteUrl } from "@/lib/siteUrl";
 import CatalogTypeSync from "@/components/catalog/CatalogTypeSync";
 import { CatalogType } from "@/lib/catalogType";
@@ -76,6 +78,7 @@ export default async function ProductoPage({
   };
 
   const base = getSiteUrl();
+  const store = await getStoreLocation();
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -112,6 +115,7 @@ export default async function ProductoPage({
           <RelatedProducts categoryId={product.categoryId} excludeId={product.id} />
         </Suspense>
       </div>
+      <StoreLocation config={store.config} photos={store.photos} />
     </>
   );
 }

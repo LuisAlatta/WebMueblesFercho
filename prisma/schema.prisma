@@ -166,7 +166,18 @@ model SiteConfig {
   tiktok              String?
   promoBannerText     String?
   promoBannerActive   Boolean  @default(false)
+  latitude            Float?
+  longitude           Float?
   updatedAt           DateTime @updatedAt
+}
+
+model StoreDirectionPhoto {
+  id        Int      @id @default(autoincrement())
+  url       String
+  path      String
+  caption   String?
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
 }
 
 model AdminUser {

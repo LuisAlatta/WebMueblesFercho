@@ -4,6 +4,8 @@ import { Metadata } from "next";
 import CatalogTypeSync from "@/components/catalog/CatalogTypeSync";
 import { CatalogType } from "@/lib/catalogType";
 import PromoGrid from "@/components/catalog/PromoGrid";
+import StoreLocation from "@/components/catalog/StoreLocation";
+import { getStoreLocation } from "@/lib/getStoreLocation";
 
 export const revalidate = 60;
 
@@ -76,7 +78,10 @@ export default async function PromocionesPage({ params }: Props) {
     })),
   }));
 
+  const store = await getStoreLocation();
+
   return (
+    <>
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-10">
       <CatalogTypeSync tipo={tipo as CatalogType} />
 
@@ -101,5 +106,7 @@ export default async function PromocionesPage({ params }: Props) {
 
       <PromoGrid products={products} sets={serializedSets} tipo={tipo as CatalogType} />
     </div>
+    <StoreLocation config={store.config} photos={store.photos} />
+    </>
   );
 }
