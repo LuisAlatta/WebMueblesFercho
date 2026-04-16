@@ -92,6 +92,7 @@ export default function AdminSidebar({
         "lg:relative lg:translate-x-0 lg:z-auto lg:shrink-0",
         collapsed ? "lg:w-[72px]" : "lg:w-64"
       )}
+      style={{ paddingTop: "env(safe-area-inset-top)" }}
     >
       {/* Logo */}
       <div

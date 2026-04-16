@@ -27,7 +27,13 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
         closeMobileMenu: () => setMobileOpen(false),
       }}
     >
-      <div className="flex h-screen overflow-hidden bg-[#F6F7F9]">
+      <div
+        className="flex overflow-hidden bg-[#F6F7F9]"
+        style={{
+          height: "100dvh",
+          paddingTop: "env(safe-area-inset-top)",
+        }}
+      >
         {/* Mobile overlay */}
         {mobileOpen && (
           <div
