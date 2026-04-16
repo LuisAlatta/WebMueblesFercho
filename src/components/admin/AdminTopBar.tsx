@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LogOut, ExternalLink, Menu, ChevronDown, User } from "lucide-react";
+import { LogOut, Menu, ChevronDown, ShoppingBag, Store } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAdminLayout } from "./AdminShell";
 
@@ -58,16 +58,6 @@ export default function AdminTopBar({ title, subtitle }: AdminTopBarProps) {
       </div>
 
       <div className="flex items-center gap-2">
-        <a
-          href="/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hidden sm:inline-flex text-xs font-medium text-slate-600 hover:text-slate-900 items-center gap-1.5 transition-colors border border-slate-200 hover:border-slate-300 hover:bg-slate-50 px-3 h-9 rounded-lg"
-        >
-          <ExternalLink className="w-3.5 h-3.5" />
-          <span>Ver sitio</span>
-        </a>
-
         <DropdownMenu>
           <DropdownMenuTrigger
             className="flex items-center gap-2 h-9 pl-1 pr-2 sm:pr-2.5 rounded-lg hover:bg-slate-100 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-[#C9A96E]/40"
@@ -94,13 +84,13 @@ export default function AdminTopBar({ title, subtitle }: AdminTopBarProps) {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => window.open("/", "_blank")}>
-              <ExternalLink className="w-4 h-4" />
-              Ver sitio
+            <DropdownMenuItem onClick={() => window.open("/catalogo/min", "_blank")}>
+              <ShoppingBag className="w-4 h-4" />
+              Catálogo por menor
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => router.push("/admin/configuracion")}>
-              <User className="w-4 h-4" />
-              Configuración
+            <DropdownMenuItem onClick={() => window.open("/catalogo/max", "_blank")}>
+              <Store className="w-4 h-4" />
+              Catálogo por mayor
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
