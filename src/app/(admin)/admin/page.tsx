@@ -80,7 +80,9 @@ function StatsSkeleton() {
 async function AlertsBanner() {
   const [productsWithoutImages, productsWithoutVariants] = await Promise.all([
     prisma.product.count({ where: { images: { none: {} } } }),
-    prisma.product.count({ where: { variants: { none: {} } } }),
+    prisma.product.count({
+      where: { retailPrice: null, wholesalePrice: null },
+    }),
   ]);
   const alerts = productsWithoutImages + productsWithoutVariants;
   if (alerts === 0) return null;
