@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { LogOut, ExternalLink, Menu, ChevronDown, User } from "lucide-react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useAdminLayout } from "./AdminShell";
 
 interface AdminTopBarProps {
@@ -29,6 +29,7 @@ function getInitials(nameOrEmail: string): string {
 export default function AdminTopBar({ title, subtitle }: AdminTopBarProps) {
   const { data: session } = useSession();
   const { toggleMobileMenu } = useAdminLayout();
+  const router = useRouter();
 
   const displayName = session?.user?.name || session?.user?.email || "";
   const email = session?.user?.email || "";
@@ -57,14 +58,15 @@ export default function AdminTopBar({ title, subtitle }: AdminTopBarProps) {
       </div>
 
       <div className="flex items-center gap-2">
-        <Link
+        <a
           href="/"
           target="_blank"
+          rel="noopener noreferrer"
           className="hidden sm:inline-flex text-xs font-medium text-slate-600 hover:text-slate-900 items-center gap-1.5 transition-colors border border-slate-200 hover:border-slate-300 hover:bg-slate-50 px-3 h-9 rounded-lg"
         >
           <ExternalLink className="w-3.5 h-3.5" />
           <span>Ver sitio</span>
-        </Link>
+        </a>
 
         <DropdownMenu>
           <DropdownMenuTrigger
@@ -92,11 +94,11 @@ export default function AdminTopBar({ title, subtitle }: AdminTopBarProps) {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem render={<Link href="/" target="_blank" />}>
+            <DropdownMenuItem onClick={() => window.open("/", "_blank")}>
               <ExternalLink className="w-4 h-4" />
               Ver sitio
             </DropdownMenuItem>
-            <DropdownMenuItem render={<Link href="/admin/configuracion" />}>
+            <DropdownMenuItem onClick={() => router.push("/admin/configuracion")}>
               <User className="w-4 h-4" />
               Configuración
             </DropdownMenuItem>
