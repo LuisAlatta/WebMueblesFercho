@@ -2,19 +2,24 @@
 
 import { useEffect, useState } from "react";
 import AdminTopBar from "@/components/admin/AdminTopBar";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Plus, Trash2, Loader2, Star } from "lucide-react";
-import { toast } from "sonner";
-import { motion, AnimatePresence } from "framer-motion";
+import PageHeader from "@/components/admin/PageHeader";
+import FormField from "@/components/admin/FormField";
+import LoadingButton from "@/components/admin/LoadingButton";
 import ConfirmDialog, { useConfirmDialog } from "@/components/admin/ConfirmDialog";
 import EmptyState from "@/components/admin/EmptyState";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Trash2, Star, Plus, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface Testimonial {
-  id: number; clientName: string; text: string; rating: number;
-  photoUrl: string | null; isActive: boolean;
+  id: number;
+  clientName: string;
+  text: string;
+  rating: number;
+  photoUrl: string | null;
+  isActive: boolean;
 }
 
 export default function TestimoniosPage() {
@@ -27,12 +32,8 @@ export default function TestimoniosPage() {
   async function load() {
     setLoading(true);
     const res = await fetch("/api/testimonios");
-    if (res.ok) {
-      const data = await res.json();
-      setItems(data);
-    } else {
-      toast.error("Error al cargar testimonios");
-    }
+    if (res.ok) setItems(await res.json());
+    else toast.error("Error al cargar testimonios");
     setLoading(false);
   }
 
@@ -64,31 +65,25 @@ export default function TestimoniosPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id: item.id, isActive: !item.isActive }),
     });
-    if (res.ok) {
-      load();
-    } else {
-      toast.error("Error al actualizar");
-    }
+    if (res.ok) load();
+    else toast.error("Error al actualizar");
   }
 
-  function remove(id: number) {
+  function remove(item: Testimonial) {
     confirm({
       title: "Eliminar testimonio",
-      description: "Esta accion no se puede deshacer.",
+      itemName: item.clientName,
+      description: "Esta acción no se puede deshacer.",
       confirmLabel: "Eliminar",
       variant: "danger",
       onConfirm: async () => {
         const res = await fetch("/api/testimonios", {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id }),
+          body: JSON.stringify({ id: item.id }),
         });
-        if (res.ok) {
-          toast.success("Eliminado");
-          load();
-        } else {
-          toast.error("Error al eliminar");
-        }
+        if (res.ok) { toast.success("Eliminado"); load(); }
+        else toast.error("Error al eliminar");
       },
     });
   }
@@ -97,116 +92,120 @@ export default function TestimoniosPage() {
     <>
       <AdminTopBar title="Testimonios" />
       <main className="flex-1 overflow-y-auto p-4 sm:p-6">
+        <PageHeader
+          title="Testimonios"
+          description="Opiniones de clientes que se muestran en la tienda."
+          icon={Star}
+        />
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-4">
-            <h2 className="font-semibold text-[#1C1C1E]">Agregar testimonio</h2>
-            <div className="space-y-2">
-              <Label>Nombre del cliente</Label>
+          <div className="admin-card p-5 space-y-4 self-start">
+            <h3 className="text-sm font-semibold text-slate-900">Agregar testimonio</h3>
+            <FormField label="Nombre del cliente" htmlFor="test-name" required>
               <Input
+                id="test-name"
                 value={form.clientName}
                 onChange={(e) => setForm((p) => ({ ...p, clientName: e.target.value }))}
-                placeholder="Maria Garcia"
+                placeholder="María García"
+                className="h-9"
               />
-            </div>
-            <div className="space-y-2">
-              <Label>Comentario</Label>
+            </FormField>
+            <FormField label="Comentario" htmlFor="test-text" required>
               <Textarea
+                id="test-text"
                 value={form.text}
                 onChange={(e) => setForm((p) => ({ ...p, text: e.target.value }))}
                 rows={3}
                 placeholder="Excelente calidad..."
               />
-            </div>
-            <div className="space-y-2">
-              <Label>Rating (1-5 estrellas)</Label>
+            </FormField>
+            <FormField label="Rating">
               <div className="flex gap-1 items-center">
                 {[1, 2, 3, 4, 5].map((n) => (
                   <button
                     key={n}
                     type="button"
                     onClick={() => setForm((p) => ({ ...p, rating: String(n) }))}
-                    className="p-1 rounded-md transition-colors hover:bg-[#FAF9F7]"
+                    className="p-1 rounded-md transition-colors hover:bg-slate-100"
                   >
                     <Star
-                      className={`w-7 h-7 transition-all duration-150 ${
+                      className={`w-6 h-6 transition-all duration-150 ${
                         n <= parseInt(form.rating)
-                          ? "text-[#C9A96E] fill-[#C9A96E] drop-shadow-sm"
-                          : "text-gray-200 hover:text-gray-300"
+                          ? "text-[#C9A96E] fill-[#C9A96E]"
+                          : "text-slate-200 hover:text-slate-300"
                       }`}
                     />
                   </button>
                 ))}
-                <span className="text-sm text-[#7A7A7A] ml-2 font-medium">{form.rating}/5</span>
+                <span className="text-sm text-slate-500 ml-2 font-medium">{form.rating}/5</span>
               </div>
-            </div>
-            <Button
+            </FormField>
+            <LoadingButton
               onClick={add}
-              disabled={saving}
-              className="w-full bg-[#1C1C1E] hover:bg-[#2C2C2E] text-white"
+              loading={saving}
+              loadingText="Agregando..."
+              className="w-full bg-[#1C1C1E] hover:bg-[#2C2C2E] text-white h-9"
             >
-              {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Plus className="w-4 h-4 mr-2" />}
-              Agregar
-            </Button>
+              <Plus className="w-4 h-4" /> Agregar
+            </LoadingButton>
           </div>
 
-          <div className="bg-white rounded-xl border border-gray-100 p-5">
-            <h2 className="font-semibold text-[#1C1C1E] mb-4">Testimonios ({items.length})</h2>
+          <div className="admin-card p-5">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-semibold text-slate-900">Testimonios</h3>
+              {items.length > 0 && (
+                <span className="text-xs font-medium bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">
+                  {items.length}
+                </span>
+              )}
+            </div>
             {loading ? (
               <div className="flex justify-center py-8">
-                <Loader2 className="w-5 h-5 animate-spin text-[#7A7A7A]" />
+                <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
               </div>
             ) : items.length === 0 ? (
-              <EmptyState
-                icon={Star}
-                title="No hay testimonios"
-                description="Agrega tu primer testimonio de cliente."
-              />
+              <EmptyState icon={Star} title="No hay testimonios" description="Agregá tu primer testimonio de cliente." size="sm" />
             ) : (
               <ul className="space-y-3">
                 <AnimatePresence mode="popLayout">
-                  {items.map((item, index) => (
+                  {items.map((item, i) => (
                     <motion.li
                       key={item.id}
-                      initial={{ opacity: 0, y: 12 }}
+                      initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -8, transition: { duration: 0.15 } }}
-                      transition={{ duration: 0.25, delay: index * 0.05 }}
-                      className={`p-4 rounded-xl border transition-shadow duration-200 hover:shadow-md ${
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.2, delay: i * 0.04 }}
+                      className={`p-4 rounded-xl border transition-all duration-200 hover:shadow-sm ${
                         item.isActive
-                          ? "border-gray-100 bg-[#FAF9F7]"
-                          : "border-gray-200 bg-gray-50 opacity-60"
+                          ? "border-slate-200/70 bg-slate-50/50"
+                          : "border-slate-200 bg-slate-50 opacity-50"
                       }`}
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold text-[#1C1C1E]">{item.clientName}</p>
+                          <p className="text-sm font-semibold text-slate-900">{item.clientName}</p>
                           <div className="flex gap-0.5 my-1.5">
-                            {Array.from({ length: 5 }).map((_, i) => (
+                            {Array.from({ length: 5 }).map((_, si) => (
                               <Star
-                                key={i}
-                                className={`w-3.5 h-3.5 transition-colors ${
-                                  i < item.rating
-                                    ? "text-[#C9A96E] fill-[#C9A96E]"
-                                    : "text-gray-200"
+                                key={si}
+                                className={`w-3.5 h-3.5 ${
+                                  si < item.rating ? "text-[#C9A96E] fill-[#C9A96E]" : "text-slate-200"
                                 }`}
                               />
                             ))}
-                            <span className="text-[10px] text-[#7A7A7A] ml-1.5 self-center">
-                              {item.rating}/5
-                            </span>
                           </div>
-                          <p className="text-xs text-[#7A7A7A] line-clamp-2 leading-relaxed">{item.text}</p>
+                          <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">{item.text}</p>
                         </div>
-                        <div className="flex gap-1.5 shrink-0">
+                        <div className="flex gap-1 shrink-0">
                           <button
                             onClick={() => toggle(item)}
-                            className="text-xs text-[#7A7A7A] hover:text-[#1C1C1E] px-2.5 py-1 rounded-lg bg-white border border-gray-200 hover:border-gray-300 transition-all duration-150 hover:shadow-sm"
+                            className="text-xs text-slate-500 hover:text-slate-800 px-2.5 py-1 rounded-lg border border-slate-200 hover:border-slate-300 transition-colors"
                           >
                             {item.isActive ? "Ocultar" : "Mostrar"}
                           </button>
                           <button
-                            onClick={() => remove(item.id)}
-                            className="text-red-400 hover:text-red-600 hover:bg-red-50 transition-all duration-150 p-1.5 rounded-lg"
+                            onClick={() => remove(item)}
+                            className="text-slate-300 hover:text-red-500 hover:bg-red-50 transition-colors p-1.5 rounded-lg"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>

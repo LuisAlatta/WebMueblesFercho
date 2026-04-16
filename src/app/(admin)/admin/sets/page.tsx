@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import AdminTopBar from "@/components/admin/AdminTopBar";
+import PageHeader from "@/components/admin/PageHeader";
+import DataTable, { type Column } from "@/components/admin/DataTable";
 import ConfirmDialog, { useConfirmDialog } from "@/components/admin/ConfirmDialog";
 import EmptyState from "@/components/admin/EmptyState";
 import { Button } from "@/components/ui/button";
@@ -11,7 +13,6 @@ import { Plus, Pencil, Trash2, ToggleLeft, ToggleRight, Sofa, Star } from "lucid
 import { toast } from "sonner";
 import Link from "next/link";
 import Image from "next/image";
-import { motion } from "framer-motion";
 
 interface ProductSet {
   id: number;
@@ -25,54 +26,6 @@ interface ProductSet {
   items: { id: number; product: { id: number; name: string } }[];
 }
 
-/* Skeleton for loading state */
-function CombosSkeleton() {
-  return (
-    <>
-      {/* Mobile skeleton */}
-      <div className="lg:hidden space-y-3">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="bg-white rounded-xl border border-gray-100 p-4 flex gap-3 animate-pulse">
-            <div className="w-14 h-14 rounded-lg bg-gray-200 shrink-0" />
-            <div className="flex-1 space-y-2 py-1">
-              <div className="h-4 bg-gray-200 rounded w-3/4" />
-              <div className="h-3 bg-gray-100 rounded w-1/2" />
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Desktop skeleton */}
-      <div className="hidden lg:block bg-white rounded-xl border border-gray-100 overflow-hidden">
-        <div className="bg-[#FAF9F7] border-b border-gray-100 px-5 py-3 flex gap-8">
-          <div className="h-4 bg-gray-200 rounded w-20 animate-pulse" />
-          <div className="h-4 bg-gray-200 rounded w-20 animate-pulse" />
-          <div className="h-4 bg-gray-200 rounded w-20 animate-pulse" />
-          <div className="h-4 bg-gray-200 rounded w-16 animate-pulse" />
-        </div>
-        {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="px-5 py-3 flex items-center gap-6 border-b border-gray-50 animate-pulse">
-            <div className="flex items-center gap-3 flex-1">
-              <div className="w-10 h-10 rounded-lg bg-gray-200 shrink-0" />
-              <div className="space-y-1.5 flex-1">
-                <div className="h-4 bg-gray-200 rounded w-40" />
-                <div className="h-3 bg-gray-100 rounded w-28" />
-              </div>
-            </div>
-            <div className="h-5 bg-gray-200 rounded w-20" />
-            <div className="h-4 bg-gray-100 rounded w-24" />
-            <div className="h-5 bg-gray-200 rounded w-16" />
-            <div className="flex gap-2">
-              <div className="h-8 w-8 bg-gray-100 rounded" />
-              <div className="h-8 w-8 bg-gray-100 rounded" />
-            </div>
-          </div>
-        ))}
-      </div>
-    </>
-  );
-}
-
 export default function CombosPage() {
   const [sets, setSets] = useState<ProductSet[]>([]);
   const [loading, setLoading] = useState(true);
@@ -82,12 +35,8 @@ export default function CombosPage() {
   async function load() {
     setLoading(true);
     const res = await fetch("/api/sets");
-    if (res.ok) {
-      const data = await res.json();
-      setSets(data);
-    } else {
-      toast.error("Error al cargar combos");
-    }
+    if (res.ok) setSets(await res.json());
+    else toast.error("Error al cargar combos");
     setLoading(false);
   }
 
@@ -102,9 +51,7 @@ export default function CombosPage() {
     if (res.ok) {
       toast.success(set.isActive ? "Combo desactivado" : "Combo activado");
       load();
-    } else {
-      toast.error("Error al actualizar");
-    }
+    } else toast.error("Error al actualizar");
   }
 
   async function togglePromo(set: ProductSet) {
@@ -116,189 +63,137 @@ export default function CombosPage() {
     if (res.ok) {
       toast.success(set.isFeatured ? "Quitado de promociones" : "Agregado a promociones");
       load();
-    } else {
-      toast.error("Error al actualizar");
-    }
+    } else toast.error("Error al actualizar");
   }
 
   function remove(set: ProductSet) {
     confirm({
-      title: `¿Eliminar el combo "${set.name}"?`,
-      description: "Esta acción no se puede deshacer. Los productos del combo no serán eliminados.",
+      title: "Eliminar combo",
+      itemName: set.name,
+      description: "Los productos del combo no serán eliminados.",
       confirmLabel: "Eliminar",
       variant: "danger",
       onConfirm: async () => {
         const res = await fetch(`/api/sets/${set.id}`, { method: "DELETE" });
-        if (res.ok) {
-          toast.success("Combo eliminado");
-          load();
-        } else {
-          toast.error("Error al eliminar");
-        }
+        if (res.ok) { toast.success("Combo eliminado"); load(); }
+        else toast.error("Error al eliminar");
       },
     });
   }
+
+  const columns: Column<ProductSet>[] = [
+    {
+      key: "name",
+      header: "Combo",
+      cell: (s) => (
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-slate-100 overflow-hidden shrink-0 flex items-center justify-center">
+            {s.imageUrl ? (
+              <Image src={s.imageUrl} alt={s.name} width={40} height={40} className="object-cover w-full h-full" />
+            ) : (
+              <Sofa className="w-4 h-4 text-slate-400" />
+            )}
+          </div>
+          <div className="min-w-0">
+            <p className="font-medium text-slate-900 truncate">{s.name}</p>
+            {s.description && <p className="text-xs text-slate-500 truncate max-w-[200px]">{s.description}</p>}
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: "category",
+      header: "Categoría",
+      hideBelow: "lg",
+      cell: (s) => s.category ? <Badge variant="secondary">{s.category.name}</Badge> : <span className="text-slate-400">—</span>,
+    },
+    {
+      key: "products",
+      header: "Productos",
+      cell: (s) => <span className="text-slate-600 text-xs">{s.items.length} producto{s.items.length !== 1 ? "s" : ""}</span>,
+    },
+    {
+      key: "promo",
+      header: "Promo",
+      cell: (s) => (
+        <button
+          onClick={(e) => { e.stopPropagation(); togglePromo(s); }}
+          className={`flex items-center gap-1.5 px-2 py-1 rounded-md transition-colors ${
+            s.isFeatured ? "bg-amber-50 text-amber-600" : "text-slate-400 hover:text-amber-500"
+          }`}
+        >
+          <Star className={`w-4 h-4 ${s.isFeatured ? "fill-amber-500" : ""}`} />
+          <span className="text-xs font-medium">{s.isFeatured ? "Sí" : "—"}</span>
+        </button>
+      ),
+    },
+    {
+      key: "status",
+      header: "Estado",
+      cell: (s) => (
+        <button
+          onClick={(e) => { e.stopPropagation(); toggle(s); }}
+          className="flex items-center gap-1.5 text-sm"
+        >
+          {s.isActive ? (
+            <><ToggleRight className="w-5 h-5 text-emerald-500" /><span className="text-emerald-600 font-medium">Activo</span></>
+          ) : (
+            <><ToggleLeft className="w-5 h-5 text-slate-300" /><span className="text-slate-400">Inactivo</span></>
+          )}
+        </button>
+      ),
+    },
+  ];
 
   return (
     <>
       <AdminTopBar title="Combos de productos" />
       <main className="flex-1 overflow-y-auto p-4 sm:p-6">
+        <PageHeader
+          title="Combos"
+          description="Agrupá productos que combinan bien juntos. Ej: 'Dormitorio completo'."
+          icon={Sofa}
+          actions={
+            <Link href="/admin/sets/nuevo">
+              <Button className="bg-[#1C1C1E] hover:bg-[#2C2C2E] text-white h-9">
+                <Plus className="w-4 h-4" /> Nuevo combo
+              </Button>
+            </Link>
+          }
+        />
 
-        <div className="flex flex-col sm:flex-row gap-3 mb-5">
-          <div className="flex-1">
-            <p className="text-sm text-[#7A7A7A]">
-              Agrupa productos que combinan bien juntos. Ej: &quot;Dormitorio completo&quot;.
-            </p>
-          </div>
-          <Link href="/admin/sets/nuevo" className="sm:ml-auto">
-            <Button className="w-full sm:w-auto bg-[#1C1C1E] hover:bg-[#2C2C2E] text-white">
-              <Plus className="w-4 h-4 mr-2" /> Nuevo combo
-            </Button>
-          </Link>
-        </div>
-
-        {loading ? (
-          <CombosSkeleton />
-        ) : sets.length === 0 ? (
-          <EmptyState
-            icon={Sofa}
-            title="No hay combos creados aún"
-            description="Agrupa productos que combinan bien juntos para mostrarlos como combo."
-            actionLabel="Crear primer combo"
-            actionHref="/admin/sets/nuevo"
-          />
-        ) : (
-          <>
-            {/* Mobile: cards */}
-            <div className="lg:hidden space-y-3">
-              {sets.map((set, index) => (
-                <motion.div
-                  key={set.id}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.25, delay: index * 0.05 }}
-                  className="bg-white rounded-xl border border-gray-100 p-4 flex gap-3"
-                >
-                  <div className="w-14 h-14 rounded-lg bg-gray-100 overflow-hidden shrink-0 flex items-center justify-center">
-                    {set.imageUrl ? (
-                      <Image src={set.imageUrl} alt={set.name} width={56} height={56} className="object-cover w-full h-full" />
-                    ) : (
-                      <Sofa className="w-5 h-5 text-gray-400" />
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-2">
-                      <p className="font-medium text-[#1C1C1E] text-sm truncate">{set.name}</p>
-                      <div className="flex gap-1 shrink-0">
-                        <Link href={`/admin/sets/${set.id}`}>
-                          <Button variant="ghost" size="sm" className="h-7 w-7 p-0"><Pencil className="w-3.5 h-3.5" /></Button>
-                        </Link>
-                        <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-red-400 hover:text-red-600 hover:bg-red-50" onClick={() => remove(set)}>
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </Button>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                      {set.category && <Badge variant="secondary" className="text-xs">{set.category.name}</Badge>}
-                      <span className="text-xs text-[#7A7A7A]">{set.items.length} producto{set.items.length !== 1 ? "s" : ""}</span>
-                      <button onClick={() => toggle(set)} className="flex items-center gap-1 text-xs">
-                        {set.isActive
-                          ? <><ToggleRight className="w-4 h-4 text-green-500" /><span className="text-green-600 font-medium">Activo</span></>
-                          : <><ToggleLeft className="w-4 h-4 text-gray-400" /><span className="text-gray-400">Inactivo</span></>}
-                      </button>
-                      <button onClick={() => togglePromo(set)} className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-100">
-                        <Star className={`w-3 h-3 ${set.isFeatured ? "fill-amber-500 text-amber-500" : "text-amber-400"}`} />
-                        <span>En Promoción</span>
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-
-            {/* Desktop: table */}
-            <div className="hidden lg:block bg-white rounded-xl border border-gray-100 overflow-hidden">
-              <table className="w-full text-sm">
-                <thead className="bg-[#FAF9F7] border-b border-gray-100">
-                  <tr>
-                    <th className="text-left px-5 py-3 font-medium text-[#7A7A7A]">Combo</th>
-                    <th className="text-left px-5 py-3 font-medium text-[#7A7A7A]">Categoría</th>
-                    <th className="text-left px-5 py-3 font-medium text-[#7A7A7A]">Productos</th>
-                    <th className="text-left px-5 py-3 font-medium text-[#7A7A7A]">Promo</th>
-                    <th className="text-left px-5 py-3 font-medium text-[#7A7A7A]">Estado</th>
-                    <th className="px-5 py-3" />
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-50">
-                  {sets.map((set, index) => (
-                    <motion.tr
-                      key={set.id}
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.2, delay: index * 0.04 }}
-                      className="hover:bg-[#FAF9F7] transition-colors cursor-pointer"
-                      onClick={() => router.push(`/admin/sets/${set.id}`)}
-                    >
-                      <td className="px-5 py-3">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-gray-100 overflow-hidden shrink-0 flex items-center justify-center">
-                            {set.imageUrl
-                              ? <Image src={set.imageUrl} alt={set.name} width={40} height={40} className="object-cover w-full h-full" />
-                              : <Sofa className="w-4 h-4 text-gray-400" />}
-                          </div>
-                          <div>
-                            <p className="font-medium text-[#1C1C1E]">{set.name}</p>
-                            {set.description && <p className="text-xs text-[#7A7A7A] truncate max-w-[200px]">{set.description}</p>}
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-5 py-3">
-                        {set.category ? <Badge variant="secondary">{set.category.name}</Badge> : <span className="text-[#7A7A7A]">—</span>}
-                      </td>
-                      <td className="px-5 py-3 text-[#7A7A7A]">
-                        {set.items.length} producto{set.items.length !== 1 ? "s" : ""}
-                      </td>
-                      <td className="px-5 py-3">
-                        <button
-                          onClick={(e) => { e.stopPropagation(); togglePromo(set); }}
-                          className={`flex items-center gap-1.5 px-2 py-1 rounded-md transition-colors ${set.isFeatured ? "bg-amber-50 text-amber-600" : "text-gray-400 hover:text-amber-500"}`}
-                        >
-                          <Star className={`w-4 h-4 ${set.isFeatured ? "fill-amber-500" : ""}`} />
-                          <span className="text-xs font-medium">{set.isFeatured ? "En Promoción" : "Destacar"}</span>
-                        </button>
-                      </td>
-                      <td className="px-5 py-3">
-                        <button
-                          onClick={(e) => { e.stopPropagation(); toggle(set); }}
-                          className="flex items-center gap-1.5 text-sm"
-                        >
-                          {set.isActive
-                            ? <><ToggleRight className="w-5 h-5 text-green-500" /><span className="text-green-600">Activo</span></>
-                            : <><ToggleLeft className="w-5 h-5 text-gray-400" /><span className="text-gray-400">Inactivo</span></>}
-                        </button>
-                      </td>
-                      <td className="px-5 py-3">
-                        <div className="flex items-center gap-2 justify-end">
-                          <Link href={`/admin/sets/${set.id}`} onClick={(e) => e.stopPropagation()}>
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0"><Pencil className="w-3.5 h-3.5" /></Button>
-                          </Link>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 w-8 p-0 text-red-400 hover:text-red-600 hover:bg-red-50"
-                            onClick={(e) => { e.stopPropagation(); remove(set); }}
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </Button>
-                        </div>
-                      </td>
-                    </motion.tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </>
-        )}
+        <DataTable
+          data={sets}
+          columns={columns}
+          getRowKey={(s) => s.id}
+          loading={loading}
+          onRowClick={(s) => router.push(`/admin/sets/${s.id}`)}
+          actions={(s) => (
+            <>
+              <Link href={`/admin/sets/${s.id}`} onClick={(e) => e.stopPropagation()}>
+                <Button variant="ghost" size="icon-sm" aria-label="Editar"><Pencil className="w-3.5 h-3.5" /></Button>
+              </Link>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                className="text-red-400 hover:text-red-600 hover:bg-red-50"
+                onClick={(e) => { e.stopPropagation(); remove(s); }}
+                aria-label="Eliminar"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </Button>
+            </>
+          )}
+          emptyState={
+            <EmptyState
+              icon={Sofa}
+              title="No hay combos creados aún"
+              description="Agrupá productos que combinan bien juntos para mostrarlos como combo."
+              actionLabel="Crear primer combo"
+              actionHref="/admin/sets/nuevo"
+            />
+          }
+        />
       </main>
 
       <ConfirmDialog {...dialogProps} />

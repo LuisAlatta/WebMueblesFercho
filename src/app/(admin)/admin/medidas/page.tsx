@@ -2,14 +2,15 @@
 
 import { useEffect, useState } from "react";
 import AdminTopBar from "@/components/admin/AdminTopBar";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Plus, Trash2, Loader2, Ruler } from "lucide-react";
-import { toast } from "sonner";
-import { motion, AnimatePresence } from "framer-motion";
+import PageHeader from "@/components/admin/PageHeader";
+import FormField from "@/components/admin/FormField";
+import LoadingButton from "@/components/admin/LoadingButton";
 import ConfirmDialog, { useConfirmDialog } from "@/components/admin/ConfirmDialog";
 import EmptyState from "@/components/admin/EmptyState";
+import { Input } from "@/components/ui/input";
+import { Trash2, Ruler, Plus, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface Measurement {
   id: number;
@@ -28,12 +29,8 @@ export default function MedidasPage() {
   async function load() {
     setLoading(true);
     const res = await fetch("/api/medidas");
-    if (res.ok) {
-      const data = await res.json();
-      setMeasurements(data);
-    } else {
-      toast.error("Error al cargar medidas");
-    }
+    if (res.ok) setMeasurements(await res.json());
+    else toast.error("Error al cargar medidas");
     setLoading(false);
   }
 
@@ -49,8 +46,7 @@ export default function MedidasPage() {
     });
     setSaving(false);
     if (res.ok) {
-      setNewLabel("");
-      setNewDesc("");
+      setNewLabel(""); setNewDesc("");
       toast.success("Medida agregada");
       load();
     } else {
@@ -58,24 +54,21 @@ export default function MedidasPage() {
     }
   }
 
-  function remove(id: number) {
+  function remove(m: Measurement) {
     confirm({
       title: "Eliminar medida",
-      description: "Esta medida se eliminara permanentemente. Esta accion no se puede deshacer.",
+      itemName: m.label,
+      description: "Esta acción no se puede deshacer.",
       confirmLabel: "Eliminar",
       variant: "danger",
       onConfirm: async () => {
         const res = await fetch("/api/medidas", {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id }),
+          body: JSON.stringify({ id: m.id }),
         });
-        if (res.ok) {
-          toast.success("Medida eliminada");
-          load();
-        } else {
-          toast.error("No se puede eliminar: esta en uso por alguna variante");
-        }
+        if (res.ok) { toast.success("Medida eliminada"); load(); }
+        else toast.error("No se puede eliminar: está en uso por alguna variante");
       },
     });
   }
@@ -84,81 +77,86 @@ export default function MedidasPage() {
     <>
       <AdminTopBar title="Medidas" />
       <main className="flex-1 overflow-y-auto p-4 sm:p-6">
-        <div className="max-w-2xl grid grid-cols-1 md:grid-cols-2 gap-6">
+        <PageHeader
+          title="Medidas"
+          description="Dimensiones disponibles para las variantes de producto."
+          icon={Ruler}
+        />
 
-          {/* Formulario agregar */}
-          <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-4">
-            <h2 className="font-semibold text-[#1C1C1E]">Agregar medida</h2>
-            <div className="space-y-2">
-              <Label>Etiqueta *</Label>
+        <div className="max-w-2xl grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="admin-card p-5 space-y-4">
+            <h3 className="text-sm font-semibold text-slate-900">Agregar medida</h3>
+            <FormField label="Etiqueta" htmlFor="med-label" required>
               <Input
+                id="med-label"
                 placeholder="Ej: 120x60x75 cm"
                 value={newLabel}
                 onChange={(e) => setNewLabel(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && add()}
+                className="h-9"
               />
-            </div>
-            <div className="space-y-2">
-              <Label>Descripcion (opcional)</Label>
+            </FormField>
+            <FormField label="Descripción" htmlFor="med-desc" optional>
               <Input
+                id="med-desc"
                 placeholder="Ej: Largo x Ancho x Alto"
                 value={newDesc}
                 onChange={(e) => setNewDesc(e.target.value)}
+                className="h-9"
               />
-            </div>
-            <Button
+            </FormField>
+            <LoadingButton
               onClick={add}
-              disabled={saving}
-              className="w-full bg-[#1C1C1E] hover:bg-[#2C2C2E] text-white"
+              loading={saving}
+              loadingText="Agregando..."
+              className="w-full bg-[#1C1C1E] hover:bg-[#2C2C2E] text-white h-9"
             >
-              {saving
-                ? <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                : <Plus className="w-4 h-4 mr-2" />}
-              Agregar medida
-            </Button>
+              <Plus className="w-4 h-4" /> Agregar medida
+            </LoadingButton>
           </div>
 
-          {/* Lista */}
-          <div className="bg-white rounded-xl border border-gray-100 p-5">
+          <div className="admin-card p-5">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-semibold text-[#1C1C1E]">Medidas</h2>
+              <h3 className="text-sm font-semibold text-slate-900">Medidas</h3>
               {measurements.length > 0 && (
-                <span className="text-xs font-medium bg-[#FAF9F7] text-[#7A7A7A] border border-gray-100 px-2 py-0.5 rounded-full">
+                <span className="text-xs font-medium bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">
                   {measurements.length}
                 </span>
               )}
             </div>
             {loading ? (
               <div className="flex justify-center py-8">
-                <Loader2 className="w-5 h-5 animate-spin text-[#7A7A7A]" />
+                <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
               </div>
             ) : measurements.length === 0 ? (
               <EmptyState
                 icon={Ruler}
                 title="No hay medidas"
-                description="Agrega tu primera medida."
+                description="Agregá tu primera medida."
+                size="sm"
               />
             ) : (
-              <ul className="space-y-2">
+              <ul className="space-y-1.5">
                 <AnimatePresence mode="popLayout">
                   {measurements.map((m, i) => (
                     <motion.li
                       key={m.id}
-                      initial={{ opacity: 0, y: 8 }}
+                      initial={{ opacity: 0, y: 6 }}
                       animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, x: -20 }}
-                      transition={{ duration: 0.2, delay: i * 0.04 }}
-                      className="flex items-center justify-between py-2 px-3 bg-[#FAF9F7] rounded-lg hover:shadow-sm hover:bg-[#F5F3F0] transition-all duration-150"
+                      exit={{ opacity: 0, x: -16 }}
+                      transition={{ duration: 0.18, delay: i * 0.03 }}
+                      className="flex items-center justify-between py-2.5 px-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors group"
                     >
-                      <div>
-                        <p className="text-sm font-medium text-[#2C2C2C]">{m.label}</p>
+                      <div className="min-w-0">
+                        <p className="text-sm text-slate-800 font-medium">{m.label}</p>
                         {m.description && (
-                          <p className="text-xs text-[#7A7A7A]">{m.description}</p>
+                          <p className="text-xs text-slate-500 mt-0.5">{m.description}</p>
                         )}
                       </div>
                       <button
-                        onClick={() => remove(m.id)}
-                        className="text-red-400 hover:text-red-600 transition-colors p-1"
+                        onClick={() => remove(m)}
+                        className="text-slate-300 hover:text-red-500 transition-colors p-1 opacity-0 group-hover:opacity-100"
+                        aria-label={`Eliminar ${m.label}`}
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>

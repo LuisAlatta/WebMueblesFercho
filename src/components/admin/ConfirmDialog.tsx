@@ -17,6 +17,7 @@ interface ConfirmDialogProps {
   onOpenChange: (open: boolean) => void;
   title: string;
   description?: string;
+  itemName?: string;
   confirmLabel?: string;
   cancelLabel?: string;
   variant?: "danger" | "default";
@@ -28,6 +29,7 @@ export default function ConfirmDialog({
   onOpenChange,
   title,
   description,
+  itemName,
   confirmLabel = "Confirmar",
   cancelLabel = "Cancelar",
   variant = "default",
@@ -61,8 +63,19 @@ export default function ConfirmDialog({
             >
               <Icon className="w-5 h-5" />
             </div>
-            <div className="space-y-1">
+            <div className="space-y-1.5 min-w-0 flex-1">
               <DialogTitle className="text-[#1C1C1E]">{title}</DialogTitle>
+              {itemName && (
+                <div
+                  className={`inline-flex max-w-full items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium truncate ${
+                    variant === "danger"
+                      ? "bg-red-50 text-red-700 border border-red-100"
+                      : "bg-slate-50 text-slate-700 border border-slate-200"
+                  }`}
+                >
+                  <span className="truncate">{itemName}</span>
+                </div>
+              )}
               {description && (
                 <DialogDescription className="text-[#7A7A7A]">
                   {description}
@@ -104,6 +117,7 @@ export function useConfirmDialog() {
     open: boolean;
     title: string;
     description?: string;
+    itemName?: string;
     confirmLabel?: string;
     variant?: "danger" | "default";
     onConfirm: () => void | Promise<void>;
@@ -116,6 +130,7 @@ export function useConfirmDialog() {
   function confirm(opts: {
     title: string;
     description?: string;
+    itemName?: string;
     confirmLabel?: string;
     variant?: "danger" | "default";
     onConfirm: () => void | Promise<void>;

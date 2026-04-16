@@ -3,6 +3,7 @@ import { Space_Grotesk, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import GoogleAnalytics from "@/components/catalog/GoogleAnalytics";
+import PwaViewportLock from "@/components/PwaViewportLock";
 import { getSiteUrl } from "@/lib/siteUrl";
 
 const spaceGrotesk = Space_Grotesk({
@@ -68,6 +69,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col bg-background text-foreground font-[var(--font-sans)]">
         <GoogleAnalytics />
+        <PwaViewportLock />
         <SpeedInsights />
         {children}
       </body>

@@ -2,17 +2,25 @@
 
 import { useEffect, useState } from "react";
 import AdminTopBar from "@/components/admin/AdminTopBar";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Plus, Trash2, Loader2, Pencil, Check, X, HelpCircle } from "lucide-react";
-import { toast } from "sonner";
-import { motion, AnimatePresence } from "framer-motion";
+import PageHeader from "@/components/admin/PageHeader";
+import FormField from "@/components/admin/FormField";
+import LoadingButton from "@/components/admin/LoadingButton";
 import ConfirmDialog, { useConfirmDialog } from "@/components/admin/ConfirmDialog";
 import EmptyState from "@/components/admin/EmptyState";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Plus, Trash2, Pencil, Check, X, HelpCircle, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { motion, AnimatePresence } from "framer-motion";
 
-interface Faq { id: number; question: string; answer: string; order: number; isActive: boolean; }
+interface Faq {
+  id: number;
+  question: string;
+  answer: string;
+  order: number;
+  isActive: boolean;
+}
 
 export default function FaqPage() {
   const [faqs, setFaqs] = useState<Faq[]>([]);
@@ -25,12 +33,8 @@ export default function FaqPage() {
   async function load() {
     setLoading(true);
     const res = await fetch("/api/faq");
-    if (res.ok) {
-      const data = await res.json();
-      setFaqs(data);
-    } else {
-      toast.error("Error al cargar preguntas");
-    }
+    if (res.ok) setFaqs(await res.json());
+    else toast.error("Error al cargar preguntas");
     setLoading(false);
   }
 
@@ -79,24 +83,21 @@ export default function FaqPage() {
     }
   }
 
-  function remove(id: number) {
+  function remove(faq: Faq) {
     confirm({
       title: "Eliminar pregunta",
-      description: "Esta accion no se puede deshacer.",
+      itemName: faq.question,
+      description: "Esta acción no se puede deshacer.",
       confirmLabel: "Eliminar",
       variant: "danger",
       onConfirm: async () => {
         const res = await fetch("/api/faq", {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id }),
+          body: JSON.stringify({ id: faq.id }),
         });
-        if (res.ok) {
-          toast.success("FAQ eliminada");
-          load();
-        } else {
-          toast.error("Error al eliminar la pregunta");
-        }
+        if (res.ok) { toast.success("FAQ eliminada"); load(); }
+        else toast.error("Error al eliminar la pregunta");
       },
     });
   }
@@ -105,68 +106,76 @@ export default function FaqPage() {
     <>
       <AdminTopBar title="Preguntas frecuentes" />
       <main className="flex-1 overflow-y-auto p-4 sm:p-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <PageHeader
+          title="Preguntas frecuentes"
+          description="Las FAQ se muestran en la sección de contacto del sitio."
+          icon={HelpCircle}
+        />
 
-          {/* Formulario */}
-          <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-4">
-            <h2 className="font-semibold text-[#1C1C1E]">Agregar pregunta</h2>
-            <div className="space-y-2">
-              <Label>Pregunta</Label>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="admin-card p-5 space-y-4 self-start">
+            <h3 className="text-sm font-semibold text-slate-900">Agregar pregunta</h3>
+            <FormField label="Pregunta" htmlFor="faq-q" required>
               <Input
+                id="faq-q"
                 value={form.question}
                 onChange={(e) => setForm((p) => ({ ...p, question: e.target.value }))}
-                placeholder="¿Cuanto tiempo tarda la fabricacion?"
+                placeholder="¿Cuánto tiempo tarda la fabricación?"
+                className="h-9"
               />
-            </div>
-            <div className="space-y-2">
-              <Label>Respuesta</Label>
+            </FormField>
+            <FormField label="Respuesta" htmlFor="faq-a" required>
               <Textarea
+                id="faq-a"
                 value={form.answer}
                 onChange={(e) => setForm((p) => ({ ...p, answer: e.target.value }))}
                 rows={3}
-                placeholder="Nuestros tiempos de fabricacion..."
+                placeholder="Nuestros tiempos de fabricación..."
               />
-            </div>
-            <Button
+            </FormField>
+            <LoadingButton
               onClick={add}
-              disabled={saving}
-              className="w-full bg-[#1C1C1E] hover:bg-[#2C2C2E] text-white"
+              loading={saving && !editing}
+              loadingText="Agregando..."
+              className="w-full bg-[#1C1C1E] hover:bg-[#2C2C2E] text-white h-9"
             >
-              {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Plus className="w-4 h-4 mr-2" />}
-              Agregar
-            </Button>
+              <Plus className="w-4 h-4" /> Agregar
+            </LoadingButton>
           </div>
 
-          {/* Lista */}
-          <div className="bg-white rounded-xl border border-gray-100 p-5">
-            <h2 className="font-semibold text-[#1C1C1E] mb-4">FAQs ({faqs.length})</h2>
+          <div className="admin-card p-5">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-semibold text-slate-900">FAQs</h3>
+              {faqs.length > 0 && (
+                <span className="text-xs font-medium bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">
+                  {faqs.length}
+                </span>
+              )}
+            </div>
             {loading ? (
               <div className="flex justify-center py-8">
-                <Loader2 className="w-5 h-5 animate-spin text-[#7A7A7A]" />
+                <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
               </div>
             ) : faqs.length === 0 ? (
-              <EmptyState
-                icon={HelpCircle}
-                title="No hay preguntas"
-                description="Agrega tu primera pregunta frecuente."
-              />
+              <EmptyState icon={HelpCircle} title="No hay preguntas" description="Agregá tu primera pregunta frecuente." size="sm" />
             ) : (
               <ul className="space-y-3">
                 <AnimatePresence mode="popLayout">
-                  {faqs.map((faq, index) => (
+                  {faqs.map((faq, i) => (
                     <motion.li
                       key={faq.id}
-                      initial={{ opacity: 0, y: 12 }}
+                      initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -8, transition: { duration: 0.15 } }}
-                      transition={{ duration: 0.25, delay: index * 0.05 }}
-                      className="p-4 rounded-xl border border-gray-100 bg-[#FAF9F7] transition-shadow duration-200 hover:shadow-md"
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.2, delay: i * 0.04 }}
+                      className="p-4 rounded-xl border border-slate-200/70 bg-slate-50/50 transition-all hover:shadow-sm"
                     >
                       {editing?.id === faq.id ? (
                         <div className="space-y-2">
                           <Input
                             value={editing.question}
                             onChange={(e) => setEditing({ ...editing, question: e.target.value })}
+                            className="h-9"
                           />
                           <Textarea
                             value={editing.answer}
@@ -178,16 +187,12 @@ export default function FaqPage() {
                               size="sm"
                               onClick={save}
                               disabled={saving}
-                              className="h-7 bg-[#1C1C1E] text-white hover:bg-[#2C2C2E]"
+                              className="h-8 bg-[#1C1C1E] text-white hover:bg-[#2C2C2E]"
                             >
                               {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
+                              <span className="ml-1">Guardar</span>
                             </Button>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => setEditing(null)}
-                              className="h-7"
-                            >
+                            <Button size="sm" variant="ghost" onClick={() => setEditing(null)} className="h-8">
                               <X className="w-3.5 h-3.5" />
                             </Button>
                           </div>
@@ -195,19 +200,19 @@ export default function FaqPage() {
                       ) : (
                         <div className="flex items-start justify-between gap-3">
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-[#1C1C1E]">{faq.question}</p>
-                            <p className="text-xs text-[#7A7A7A] mt-1.5 line-clamp-2 leading-relaxed">{faq.answer}</p>
+                            <p className="text-sm font-semibold text-slate-900">{faq.question}</p>
+                            <p className="text-xs text-slate-600 mt-1.5 line-clamp-2 leading-relaxed">{faq.answer}</p>
                           </div>
-                          <div className="flex gap-1.5 shrink-0">
+                          <div className="flex gap-1 shrink-0">
                             <button
                               onClick={() => setEditing(faq)}
-                              className="text-[#7A7A7A] hover:text-[#1C1C1E] hover:bg-gray-100 transition-all duration-150 p-1.5 rounded-lg"
+                              className="text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-colors p-1.5 rounded-lg"
                             >
                               <Pencil className="w-3.5 h-3.5" />
                             </button>
                             <button
-                              onClick={() => remove(faq.id)}
-                              className="text-red-400 hover:text-red-600 hover:bg-red-50 transition-all duration-150 p-1.5 rounded-lg"
+                              onClick={() => remove(faq)}
+                              className="text-slate-300 hover:text-red-500 hover:bg-red-50 transition-colors p-1.5 rounded-lg"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>

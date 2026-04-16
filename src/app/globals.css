@@ -105,6 +105,47 @@
   }
 }
 
+/* ===== Admin design tokens ===== */
+:root {
+  --admin-bg: #F6F7F9;
+  --admin-surface: #FFFFFF;
+  --admin-border: #E5E7EB;
+  --admin-border-strong: #D1D5DB;
+  --admin-text: #0F172A;
+  --admin-text-muted: #64748B;
+  --admin-text-subtle: #94A3B8;
+  --admin-accent: #C9A96E;
+  --admin-accent-soft: rgba(201, 169, 110, 0.12);
+  --admin-sidebar-from: #0B1220;
+  --admin-sidebar-to: #111827;
+  --admin-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --admin-shadow-md: 0 2px 8px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --admin-shadow-lg: 0 12px 32px -12px rgba(15, 23, 42, 0.18), 0 4px 12px -4px rgba(15, 23, 42, 0.08);
+}
+
+/* Admin utility patterns */
+.admin-card {
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: 0.875rem;
+  box-shadow: var(--admin-shadow-sm);
+}
+
+.admin-card-hover {
+  transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+}
+.admin-card-hover:hover {
+  box-shadow: var(--admin-shadow-md);
+  border-color: var(--admin-border-strong);
+}
+
+/* Focus ring consistent across admin */
+.admin-focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(201, 169, 110, 0.25);
+  border-color: var(--admin-accent);
+}
+
 /* Shimmer skeleton animation */
 .shimmer {
   background: linear-gradient(90deg, #f0ece6 25%, #e8e4de 50%, #f0ece6 75%);
